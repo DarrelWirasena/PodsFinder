@@ -35,17 +35,23 @@ const PlaylistCard = ({ playlist }) => (
   </Link>
 );
 
-const EpisodeCard = ({ podcast }) => (
-  <Link to={`/detail/${podcast.id}`} className="block">
+const EpisodeCard = ({ podcast }) => {
+  return (
     <div className="flex items-center mb-6 p-4 border border-[#3c6255] rounded-lg shadow-sm bg-[#EAE7B1] hover:shadow-md transition-shadow duration-300">
-      <img
-        src={podcast.image || PlaceholderImage}
-        alt={podcast.title}
-        className="w-28 h-28 rounded object-cover mr-4 flex-shrink-0"
-      />
-      <div>
+      <Link to={`/detail/${podcast.id}`} className="block flex-shrink-0"> {/* Link only the image and maybe title if desired */}
+        <img
+          src={podcast.image || PlaceholderImage}
+          alt={podcast.title}
+          className="w-28 h-28 rounded object-cover"
+        />
+      </Link>
+      <div className="ml-4 flex-grow">
         <p className="text-base text-[#3c6255]">{podcast.podcastTitle || podcast.title}</p>
-        <h3 className="text-lg font-semibold text-[#3c6255] mb-1">{podcast.episodeTitle || podcast.episode}</h3>
+        <h3 className="text-lg font-semibold text-[#3c6255] mb-1">
+          <Link to={`/detail/${podcast.id}`} className="hover:underline">
+            {podcast.episodeTitle || podcast.episode}
+          </Link>
+        </h3>
         <div className="flex items-center text-[#3c6255]">
           <i className="ri-star-s-fill mr-1"></i>
           <p>{podcast.rating}</p>
@@ -54,15 +60,14 @@ const EpisodeCard = ({ podcast }) => (
           <Link
             to={`/detailchannel/${podcast.channelId}`}
             className="text-sm text-[#3c6255] mt-2 hover:underline hover:text-[#2c4f43] transition-colors"
-            onClick={(e) => e.stopPropagation()}
           >
             Channel: {podcast.channelName} <i className="ri-share-box-line ml-1"></i>
           </Link>
         )}
       </div>
     </div>
-  </Link>
-);
+  );
+};
 
 export const Profil = () => {
   const [currentUser, setCurrentUser] = useState({
@@ -93,7 +98,7 @@ export const Profil = () => {
             handle={currentUser.handle}
             onClick={() => setIsEditOpen(true)} 
           />
-          <Link to="/logout">
+          <Link to="/">
             <button className='bg-[#3c6255] text-[#eae7b1] px-4 py-2 rounded-md hover:opacity-90'>
               Log out
             </button>

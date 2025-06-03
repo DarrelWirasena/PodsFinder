@@ -6,7 +6,7 @@ export const playlistsData = [
     title: 'Playlist 1',
     episodes: [
       {
-        
+        id : 'ep1a',
         podcastId: 'berizik-ep29', 
         channelId: 'berizik-channel', 
         image: BerizikCover,
@@ -15,6 +15,7 @@ export const playlistsData = [
         rating: '4.5'
       },
       {
+        id : 'ep1b',
         podcastId: 'bapak2banget-ep2', 
         channelId: 'bapak2banget-channel', 
         image: Bapak2BangetCover,

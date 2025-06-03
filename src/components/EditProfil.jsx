@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { PlaceholderImage } from '../data/podcastsData'; 
+import { PlaceholderImage, AvatarMichelle } from '../data/podcastsData'; 
 
 const EditProfil = ({ isOpen, onClose, currentUsername, onSave }) => {
   const [newUsername, setNewUsername] = useState(currentUsername);
-  const [newProfileImage, setNewProfileImage] = useState(PlaceholderImage); 
+  const [newProfileImage, setNewProfileImage] = useState(AvatarMichelle); 
 
   if (!isOpen) return null; 
   const handleImageChange = (e) => {

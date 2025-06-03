@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import PodsLogo from '../assets/images/PodsFinderHook.png';
+import Image from '../assets/images/headphone.png';
 
 import { allPodcastsData, BerizikCover, Bapak2BangetCover, NightRide, PlaceholderImage } from '../data/podcastsData';
 

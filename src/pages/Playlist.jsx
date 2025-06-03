@@ -14,16 +14,17 @@ const PlaylistSectionHeader = ({ title, linkTo = '#' }) => (
 );
 
 const EpisodeItemCard = ({ image, channel, title, rating, onTriggerConfirm, episodeId, podcastId, channelId }) => (
-    <Link to={`/detail/${podcastId}`} className="block">
         <div className="relative flex flex-col ml-8 mr-8 sm:flex-row items-start sm:items-center gap-4 p-4 bg-[#eae7b1] rounded-lg shadow-md">
             <img src={image || PlaceholderImage} alt="Episode Cover" className="w-28 h-28 rounded object-cover flex-shrink-0" />
             <div className="flex-grow">
+            <Link to={`/detail/${podcastId}`} className="block">
                 <p className="text-base text-[#3c6255] mb-1">{channel}</p>
                 <h3 className="text-lg font-semibold text-[#3c6255] mb-2">{title}</h3>
                 <div className="flex items-center text-[#3c6255]">
                     <p className="text-base leading-none">{rating}</p>
                     <i className="ri-star-s-fill text-base leading-none ml-1"></i>
                 </div>
+                </Link>
                 {channelId && channel && ( 
                     <Link
                         to={`/detailchannel/${channelId}`} 
@@ -41,8 +42,7 @@ const EpisodeItemCard = ({ image, channel, title, rating, onTriggerConfirm, epis
                     text-2xl text-[#3c6255]
                     cursor-pointer transition-colors duration-200 hover:text-red-500
                     md:static md:ml-auto md:p-0 md:text-xl
-                    ri-delete-bin-fill
-                "
+                    ri-delete-bin-fill"
                 onClick={(e) => {
                     e.preventDefault(); 
                     e.stopPropagation(); 
@@ -51,7 +51,7 @@ const EpisodeItemCard = ({ image, channel, title, rating, onTriggerConfirm, epis
             >
             </button>
         </div>
-    </Link>
+   
 );
 
 export const Playlist = ({ onTriggerConfirm }) => {

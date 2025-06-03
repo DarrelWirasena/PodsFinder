@@ -4,16 +4,18 @@ import { dataReviewed } from '../data/dataReviewed';
 
 const ReviewedPodcastCard = ({ id, image, title, episode, rating, channelId, channelName }) => { 
   return (
-    <Link to={`/detail/${id}`} className="block"> 
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 p-4 rounded-lg mb-4 bg-[#EAE7B1]/20 shadow-md hover:shadow-lg transition-shadow duration-300"> 
         <img
           src={image}
           alt={title}
           className="w-24 h-24 rounded-lg object-cover flex-shrink-0"
         />
+        
         <div className="flex flex-col justify-center text-center sm:text-left flex-grow">
+        <Link to={`/detail/${id}`} className="block"> 
           <p className="text-base font-semibold text-[#3c6255] mb-1">{title}</p>
           <p className="text-lg font-bold text-[#3c6255] mb-2">{episode}</p>
+          </Link>
           <div className="flex items-center justify-center sm:justify-start mt-1">
             <p className="text-base text-[#3c6255]">{rating}</p>
             <i className="ri-star-s-fill text-[#3c6255] text-base ml-1"></i> 
@@ -29,7 +31,7 @@ const ReviewedPodcastCard = ({ id, image, title, episode, rating, channelId, cha
           )}
         </div>
       </div>
-    </Link>
+    
   );
 };
 
