@@ -1,14 +1,9 @@
-// src/pages/Genre.jsx
-import React, { useState } from 'react'; // <-- Pastikan useState diimpor
+import React, { useState } from 'react'; 
 import { Link } from 'react-router-dom';
-// IMPOR DATA DARI FILE TERPISAH
-import { allPodcastsData, allGenresData, PlaceholderImage } from '../data/podcastsData'; // Pastikan PlaceholderImage juga diimpor
-
-// Import AddPlaylist dan playlistsData seperti yang diminta
+import { allPodcastsData, allGenresData, PlaceholderImage } from '../data/podcastsData'; 
 import { AddPlaylist } from '../components/AddPlaylist'; 
-import { playlistsData } from '../data/playlistsData'; // <-- playlistsData diimpor di sini
+import { playlistsData } from '../data/playlistsData'; 
 
-// PodcastCard sekarang akan menerima onAddToPlaylistClick dari parent
 const PodcastCard = ({ id, image, title, channel, episode, rating, onAddToPlaylistClick }) => ( 
   <div className="block p-4 bg-[#eae7b1] rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
     <Link to={`/detail/${id}`} className="block">
@@ -30,19 +25,16 @@ const PodcastCard = ({ id, image, title, channel, episode, rating, onAddToPlayli
     </Link>
 
     <div className="flex gap-3 mt-4 ">
-      {/* Tombol Review: Menggunakan Link ke detail dengan hash fragment */}
       <Link 
-        to={`/detail/${id}#review-section`} // <-- Perubahan ada di sini!
+        to={`/detail/${id}#review-section`} 
         className='flex-1 min-w-0'
       >
         <button
           className="w-full bg-[#3c6255] rounded-md h-8 text-[#EAE7B1] flex justify-center items-center hover:bg-[#2c4f43] transition-colors duration-300 text-sm px-2"
-          // Hapus onClick yang lama, karena Link akan menangani navigasi
         >
           <i className="ri-edit-2-line mr-1"></i> Review
         </button>
       </Link>
-      {/* Tombol Playlist tetap sama */}
       <button
         className="flex-1 bg-[#3c6255] rounded-md h-8 text-[#EAE7B1] flex justify-center items-center hover:bg-[#2c4f43] transition-colors duration-300 text-sm px-2"
         onClick={() => onAddToPlaylistClick(id)} 
@@ -54,29 +46,24 @@ const PodcastCard = ({ id, image, title, channel, episode, rating, onAddToPlayli
 );
 
 export const Genre = () => {
-  // State untuk mengelola pop-up AddPlaylist - DIKEMBALIKAN KE SINI
   const [isAddPlaylistPopupOpen, setIsAddPlaylistPopupOpen] = useState(false);
-  const [podcastToAddId, setPodcastToAddId] = useState(null); // Menyimpan ID podcast yang akan ditambahkan
+  const [podcastToAddId, setPodcastToAddId] = useState(null); 
 
-  // Fungsi untuk membuka pop-up AddPlaylist - DIKEMBALIKAN KE SINI
   const handleOpenAddPlaylistPopup = (id) => {
     setPodcastToAddId(id);
     setIsAddPlaylistPopupOpen(true);
   };
 
-  // Fungsi untuk menutup pop-up AddPlaylist - DIKEMBALIKAN KE SINI
   const handleCloseAddPlaylistPopup = () => {
     setIsAddPlaylistPopupOpen(false);
     setPodcastToAddId(null);
   };
 
-  // Fungsi untuk menambahkan podcast ke playlist yang dipilih - DIKEMBALIKAN KE SINI
   const handleAddToPlaylist = (playlistId) => {
     const podcastToAddToPlaylist = allPodcastsData.find(p => p.id === podcastToAddId);
     if (podcastToAddToPlaylist) {
       const targetPlaylist = playlistsData.find(p => p.id === playlistId);
       if (targetPlaylist) {
-        // Pastikan episode belum ada untuk menghindari duplikasi
         const episodeExists = targetPlaylist.episodes.some(ep => ep.id === podcastToAddToPlaylist.id);
         if (!episodeExists) {
           targetPlaylist.episodes.push({
@@ -92,10 +79,9 @@ export const Genre = () => {
         }
       }
     }
-    handleCloseAddPlaylistPopup(); // Selalu tutup pop-up setelah aksi
+    handleCloseAddPlaylistPopup(); 
   };
 
-  // Ambil daftar genre dari allGenresData
   const genres = allGenresData.map(genre => ({
     ...genre,
     podcasts: allPodcastsData.filter(podcast =>
@@ -121,7 +107,6 @@ export const Genre = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6">
-              {/* Gunakan data podcast yang sudah difilter */}
               {genre.podcasts.map((podcast) => (
                 <PodcastCard
                   key={podcast.id}
@@ -131,7 +116,7 @@ export const Genre = () => {
                   channel={podcast.channel} 
                   episode={podcast.episodes && podcast.episodes[0] ? podcast.episodes[0].title : 'No Episode Title'} 
                   rating={podcast.rating}
-                  onAddToPlaylistClick={handleOpenAddPlaylistPopup} // <-- Teruskan fungsi dari Genre.jsx
+                  onAddToPlaylistClick={handleOpenAddPlaylistPopup} 
                 />
               ))}
             </div>
@@ -143,11 +128,10 @@ export const Genre = () => {
         ))}
       </div>
 
-      {/* Render komponen pop-up AddPlaylist */}
       <AddPlaylist
         isOpen={isAddPlaylistPopupOpen}
         onClose={handleCloseAddPlaylistPopup}
-        playlists={playlistsData} // <-- Menggunakan playlistsData yang diimpor langsung
+        playlists={playlistsData} 
         onAddToPlaylist={handleAddToPlaylist} 
       />
     </div>

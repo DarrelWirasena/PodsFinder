@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
 import { Navbar } from "./components/Navbar";
+import { NavbarUser } from "./components/NavbarUser";
 import { Footer } from "./components/Footer";
 import { SearchOverlay } from "./components/SearchOverlay";
 import { Confirm } from "./components/Confirm"; 
@@ -14,13 +15,17 @@ import { Playlist } from "./pages/Playlist";
 import { Detail } from "./pages/Detail";
 import { Reviewed } from "./pages/Reviewed";
 import { DetailChannel } from "./pages/DetailChannel";
-// import { PreviewSaja } from "./pages/PreviewSaja";
 import { PlaylistViewAll } from "./pages/PlaylistViewAll";
+import { Profil } from "./pages/Profil";
 
 
 function App() {
   const location = useLocation();
-  const showNavbar = location.pathname !== "/login" && location.pathname !== "/signup";
+  var yaa = 1;
+    
+    const showNavbar = location.pathname !== "/login" && location.pathname !== "/signup";
+    const WhichNavG = showNavbar&&yaa==1;
+    const WhichNavU = showNavbar&&yaa!=1;
 
   const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false);
   const handleOpenSearchOverlay = () => {
@@ -52,14 +57,11 @@ function App() {
   };
 
   return (
-    <>
-      {showNavbar && (
-        <Navbar
-          onSearchClick={handleOpenSearchOverlay}
-        />
-      )}
+    <div className="flex flex-col min-h-screen"> 
+      {WhichNavG && (<Navbar onSearchClick={handleOpenSearchOverlay}/>)}
+      {WhichNavU && (<NavbarUser onSearchClick={handleOpenSearchOverlay}/>)}
 
-      <main className="bg-[#EAE7B1]">
+      <main className="bg-[#EAE7B1] flex-grow">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/genre" element={<Genre />} />
@@ -70,12 +72,13 @@ function App() {
           <Route path="/detail/:podcastId" element={<Detail />} />
           <Route path="/detailchannel/:channelId" element={<DetailChannel />} />
           <Route path="/reviewed" element={<Reviewed />} />
-          {/* <Route path="/previewsaja" element={<PreviewSaja />} /> */}
+          <Route path="/profil" element={<Profil/>}/>
           <Route path="/playlistviewall/:playlistId" element={<PlaylistViewAll onTriggerConfirm={triggerConfirm}/>} />
         </Routes>
       </main>
 
       {/* {showNavbar && <Footer />} */}
+      {showNavbar && <Footer />}
 
       <SearchOverlay
         isOpen={isSearchOverlayOpen}
@@ -85,15 +88,16 @@ function App() {
       <Confirm
         isOpen={isConfirm}
         onConfirm={onConfirmAction} 
-        onCancel={onCancelAction}  
+        onCancel={onCancelAction}  
       />
-    </>
+    </div> 
   );
 }
 
 function AppWrapper() {
+
   return (
-    <Router>
+    <Router> 
       <App />
     </Router>
   );

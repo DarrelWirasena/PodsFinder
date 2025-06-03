@@ -6,11 +6,8 @@ export const Confirm = ({ isOpen, onConfirm, onCancel }) => {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-[#a6bb8d]/40" 
-      onClick={onCancel} 
-    >
-      <div
-        className="p-6 flex rounded-lg flex-col bg-[#a6bb8d]/90 shadow-xl max-w-sm w-full relative" // Added relative for z-index, adjusted opacity
-      >
+      onClick={onCancel} >
+      <div className="p-6 flex rounded-lg flex-col bg-[#a6bb8d]/90 shadow-xl max-w-sm w-full relative">
         <p className="text-xl font-bold text-[#3c6255] mb-6 text-center">
           Anda yakin?
         </p>

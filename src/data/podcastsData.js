@@ -1,35 +1,26 @@
-// src/data/podcastsData.js
-
-// Import semua gambar yang diperlukan di sini.
 import BerizikCover from '../assets/images/Berizik.png';
 import Bapak2BangetCover from '../assets/images/bapak@banget.png';
 import OlahragaCover from '../assets/images/podcast olahraga.png';
-import NightRide from '../assets/images/nightRide.png'; // Pastikan ini diimpor jika digunakan di data genre
+import NightRide from '../assets/images/nightRide.png'; 
+import TanahJawa from '../assets/images/tanahJawa.png'
 import PlaceholderImage from '../assets/images/Berizik.png';
-import AvatarFrans from '../assets/images/michelle.jpg';
 import AvatarMichelle from '../assets/images/michelle.jpg';
-import AvatarBram from '../assets/images/michelle.jpg';
-import AvatarUser from '../assets/images/michelle.jpg';
 
-// Export all images that are needed directly by components
 export {
     BerizikCover,
     Bapak2BangetCover,
     OlahragaCover,
-    NightRide, // Export NightRide
+    NightRide, 
+    TanahJawa,
     PlaceholderImage,
-    AvatarFrans,
     AvatarMichelle,
-    AvatarBram,
-    AvatarUser
 };
 
 
-// --- Data Podcast Lengkap ---
 export const allPodcastsData = [
     {
         id: 'berizik-ep29',
-        coverImage: BerizikCover,
+        image: BerizikCover,
         channel: 'BERIZIK',
         channelId: 'berizik-channel',
         title: 'EP29: Last Playlist Berizik',
@@ -41,9 +32,9 @@ export const allPodcastsData = [
             { title: 'EP27: Ngopi Bareng Seleb', date: '04 DECEMBER 2024', description: 'Wawancara eksklusif dengan selebriti papan atas, membahas karir dan kehidupan pribadi.' },
         ],
         reviews: [
-            { avatarSrc: AvatarFrans, name: 'Frans', handle: '@00franss', reviewText: "Podcast ini selalu berhasil bikin ngakak! Episode terakhirnya bikin baper tapi tetap menghibur. Recommended banget!" },
+            { avatarSrc: AvatarMichelle, name: 'Frans', handle: '@00franss', reviewText: "Podcast ini selalu berhasil bikin ngakak! Episode terakhirnya bikin baper tapi tetap menghibur. Recommended banget!" },
             { avatarSrc: AvatarMichelle, name: 'Michelle', handle: '@celow', reviewText: "Kocak banget! Setiap episode selalu ada kejutan dan insight baru. Suka banget sama hostnya." },
-            { avatarSrc: AvatarBram, name: 'Bram', handle: '@braawm', reviewText: "Wajib dengerin! Kontennya segar, pengisi suaranya asik, dan bikin mood jadi naik terus." },
+            { avatarSrc: AvatarMichelle, name: 'Bram', handle: '@braawm', reviewText: "Wajib dengerin! Kontennya segar, pengisi suaranya asik, dan bikin mood jadi naik terus." },
         ],
         relatedPodcasts: [
             { id: 'bapak2banget-ep1', title: 'Bapak2banget Podcast', channel: 'BAPAK2BANGET', coverSrc: Bapak2BangetCover, rating: '4.6' },
@@ -55,14 +46,14 @@ export const allPodcastsData = [
             showWeb: 'www.berizik.com',
             yearsActive: '2023-2025',
             totalEpisodes: '150',
-            genre: 'Komedi', // Pastikan genre ini ada
+            genre: 'Komedi', 
             copyright: '© 2025 Berizik Studios',
             license: 'All Rights Reserved'
         }
     },
     {
         id: 'bapak2banget-ep1',
-        coverImage: Bapak2BangetCover,
+        image: Bapak2BangetCover,
         channel: 'BAPAK2BANGET',
         channelId: 'bapak2banget-channel',
         title: 'E01: Kisah Horor Kampung Sebelah',
@@ -83,14 +74,14 @@ export const allPodcastsData = [
             showWeb: 'www.bapak2banget.com',
             yearsActive: '2024-Sekarang',
             totalEpisodes: '20',
-            genre: 'horor', // Pastikan genre ini ada
+            genre: 'horor',
             copyright: '© 2025 Bapak2banget',
             license: 'Semua Hak Dilindungi'
         }
     },
     {
-        id: 'bapak2banget-ep2', // Podcast kedua dari Bapak2banget
-        coverImage: Bapak2BangetCover,
+        id: 'bapak2banget-ep2', 
+        image: Bapak2BangetCover,
         channel: 'BAPAK2BANGET',
         channelId: 'bapak2banget-channel',
         title: 'E02: Misteri Rumah Tua',
@@ -107,14 +98,14 @@ export const allPodcastsData = [
             showWeb: 'www.bapak2banget.com',
             yearsActive: '2024-Sekarang',
             totalEpisodes: '20',
-            genre: 'Horor', // Pastikan genre ini ada
+            genre: 'Horor', 
             copyright: '© 2025 Bapak2banget',
             license: 'Semua Hak Dilindungi'
         }
     },
     {
-        id: 'malam-jumat-ep1', // Contoh podcast Horor baru
-        coverImage: NightRide,
+        id: 'malam-jumat-ep1', 
+        image: NightRide,
         channel: 'MALAM JUMAT',
         channelId: 'malam-jumat-channel',
         title: 'Kisah Hantu Kosan',
@@ -129,14 +120,14 @@ export const allPodcastsData = [
             showWeb: 'www.malamjumat.com',
             yearsActive: '2024-Sekarang',
             totalEpisodes: '10',
-            genre: 'Horor', // Pastikan genre ini ada
+            genre: 'Horor', 
             copyright: '© 2025 Malam Jumat',
             license: 'All Rights Reserved'
         }
     },
     {
-        id: 'kisah-tanah-jawa-ep1', // Contoh podcast Horor baru
-        coverImage: NightRide,
+        id: 'kisah-tanah-jawa-ep1', 
+        image: NightRide,
         channel: 'KISAH TANAH JAWA',
         channelId: 'kisah-tanah-jawa-channel',
         title: 'Misteri Gunung Merapi',
@@ -151,14 +142,14 @@ export const allPodcastsData = [
             showWeb: 'www.kisahtanahjawa.com',
             yearsActive: '2024-Sekarang',
             totalEpisodes: '15',
-            genre: 'Horor', // Pastikan genre ini ada
+            genre: 'Horor', 
             copyright: '© 2025 Kisah Tanah Jawa',
             license: 'All Rights Reserved'
         }
     },
     {
         id: 'social-drama-1',
-        coverImage: PlaceholderImage,
+        image: PlaceholderImage,
         channel: 'PODCAST SOSIAL',
         channelId: 'podcast-sosial-channel',
         title: 'Episode 1: Drama Kehidupan',
@@ -180,7 +171,7 @@ export const allPodcastsData = [
     },
     {
         id: 'social-drama-2',
-        coverImage: PlaceholderImage,
+        image: PlaceholderImage,
         channel: 'PODCAST DRAMA',
         channelId: 'podcast-drama-channel',
         title: 'Episode 2: Realita Kota',
@@ -202,7 +193,7 @@ export const allPodcastsData = [
     },
     {
         id: 'motivation-1',
-        coverImage: PlaceholderImage,
+        image: PlaceholderImage,
         channel: 'INOVASI MUDA',
         channelId: 'inovasi-muda-channel',
         title: 'Kiat Sukses Startup',
@@ -224,7 +215,7 @@ export const allPodcastsData = [
     },
     {
         id: 'motivation-2',
-        coverImage: PlaceholderImage,
+        image: PlaceholderImage,
         channel: 'SPIRIT HARIAN',
         channelId: 'spirit-harian-channel',
         title: 'Bangkit dari Kegagalan',
@@ -246,7 +237,7 @@ export const allPodcastsData = [
     },
     {
         id: 'culture-1',
-        coverImage: PlaceholderImage,
+        image: PlaceholderImage,
         channel: 'BUDAYA KITA',
         channelId: 'budaya-kita-channel',
         title: 'Tradisi Nusantara',
@@ -268,7 +259,7 @@ export const allPodcastsData = [
     },
     {
         id: 'culture-2',
-        coverImage: PlaceholderImage,
+        image: PlaceholderImage,
         channel: 'JELAJAH SOSIAL',
         channelId: 'jelajah-sosial-channel',
         title: 'Fenomena Masyarakat',
@@ -290,7 +281,7 @@ export const allPodcastsData = [
     },
     {
         id: 'sport-1',
-        coverImage: OlahragaCover,
+        image: OlahragaCover,
         channel: 'DUNIA OLAHRAGA',
         channelId: 'dunia-olahraga-channel',
         title: 'Analisis Pertandingan',
@@ -312,7 +303,7 @@ export const allPodcastsData = [
     },
     {
         id: 'sport-2',
-        coverImage: OlahragaCover,
+        image: OlahragaCover,
         channel: 'LAPANGAN HIJAU',
         channelId: 'lapangan-hijau-channel',
         title: 'Perjalanan Juara',
@@ -334,12 +325,11 @@ export const allPodcastsData = [
     },
 ];
 
-// --- Data Channel ---
 export const allChannelsData = [
     {
         id: 'berizik-channel',
         name: 'BERIZIK Official',
-        coverImage: BerizikCover, // Menggunakan coverImage dari import
+        image: BerizikCover, 
         description: 'Channel resmi BERIZIK, menyajikan konten komedi, obrolan santai, dan wawancara inspiratif.',
         creator: 'Awwe, Noice Studios, Randhika Djamil',
         genre: 'Komedi',
@@ -348,12 +338,12 @@ export const allChannelsData = [
             instagram: 'https://instagram.com/berizik',
             youtube: 'https://www.youtube.com/channel/UC-your-channel-id',
         },
-        podcastIds: ['berizik-ep29'], // Menggunakan ID podcast dari allPodcastsData
+        podcastIds: ['berizik-ep29'], 
     },
     {
         id: 'bapak2banget-channel',
         name: 'BAPAK2BANGET Official',
-        coverImage: Bapak2BangetCover, // Menggunakan coverImage dari import
+        image: Bapak2BangetCover, 
         description: 'Dengarkan kisah horor dan komedi dari sudut pandang bapak-bapak!',
         creator: 'Tim Bapak2banget',
         genre: 'Horor, Komedi',
@@ -367,7 +357,7 @@ export const allChannelsData = [
     {
         id: 'malam-jumat-channel',
         name: 'MALAM JUMAT',
-        coverImage: NightRide, // Menggunakan NightRide dari import
+        image: NightRide, 
         description: 'Kumpulan kisah seram dan misteri yang akan membuat bulu kuduk berdiri.',
         creator: 'Tim Malam Jumat',
         genre: 'Horor',
@@ -380,7 +370,7 @@ export const allChannelsData = [
     {
         id: 'kisah-tanah-jawa-channel',
         name: 'KISAH TANAH JAWA',
-        coverImage: NightRide, // Menggunakan NightRide dari import
+        image: NightRide, 
         description: 'Membongkar mitos dan cerita mistis dari tanah Jawa.',
         creator: 'Tim Kisah Tanah Jawa',
         genre: 'Horor',
@@ -393,7 +383,7 @@ export const allChannelsData = [
     {
         id: 'podcast-sosial-channel',
         name: 'PODCAST SOSIAL',
-        coverImage: PlaceholderImage,
+        image: PlaceholderImage,
         description: 'Channel yang membahas berbagai isu sosial dan drama kehidupan.',
         creator: 'Tim Sosial',
         genre: 'Social & Drama',
@@ -406,7 +396,7 @@ export const allChannelsData = [
     {
         id: 'podcast-drama-channel',
         name: 'PODCAST DRAMA',
-        coverImage: PlaceholderImage,
+        image: PlaceholderImage,
         description: 'Menyajikan cerita drama dan realita kehidupan kota.',
         creator: 'Tim Drama',
         genre: 'Social & Drama',
@@ -419,7 +409,7 @@ export const allChannelsData = [
     {
         id: 'inovasi-muda-channel',
         name: 'INOVASI MUDA',
-        coverImage: PlaceholderImage,
+        image: PlaceholderImage,
         description: 'Inspirasi dan kiat sukses untuk para inovator muda dan startup.',
         creator: 'Tim Inovasi',
         genre: 'Motivation',
@@ -432,7 +422,7 @@ export const allChannelsData = [
     {
         id: 'spirit-harian-channel',
         name: 'SPIRIT HARIAN',
-        coverImage: PlaceholderImage,
+        image: PlaceholderImage,
         description: 'Membangun semangat dan motivasi harian untuk menghadapi tantangan.',
         creator: 'Tim Spirit',
         genre: 'Motivation',
@@ -445,7 +435,7 @@ export const allChannelsData = [
     {
         id: 'budaya-kita-channel',
         name: 'BUDAYA KITA',
-        coverImage: PlaceholderImage,
+        image: PlaceholderImage,
         description: 'Menjelajahi kekayaan tradisi dan budaya Nusantara.',
         creator: 'Tim Budaya',
         genre: 'Social & Culture',
@@ -458,7 +448,7 @@ export const allChannelsData = [
     {
         id: 'jelajah-sosial-channel',
         name: 'JELAJAH SOSIAL',
-        coverImage: PlaceholderImage,
+        image: PlaceholderImage,
         description: 'Analisis mendalam fenomena-fenomena sosial di masyarakat.',
         creator: 'Tim Jelajah',
         genre: 'Social & Culture',
@@ -471,7 +461,7 @@ export const allChannelsData = [
     {
         id: 'dunia-olahraga-channel',
         name: 'DUNIA OLAHRAGA',
-        coverImage: OlahragaCover,
+        image: OlahragaCover,
         description: 'Ulasan dan analisis komprehensif tentang dunia olahraga.',
         creator: 'Tim Olahraga',
         genre: 'Sport',
@@ -484,7 +474,7 @@ export const allChannelsData = [
     {
         id: 'lapangan-hijau-channel',
         name: 'LAPANGAN HIJAU',
-        coverImage: OlahragaCover,
+        image: OlahragaCover,
         description: 'Kisah inspiratif para juara dan perjalanan karir atlet.',
         creator: 'Tim Hijau',
         genre: 'Sport',
@@ -497,7 +487,6 @@ export const allChannelsData = [
     
 ];
 
-// --- Data Genre (untuk halaman Genre) ---
 export const allGenresData = [
     {
         name: 'Komedi',

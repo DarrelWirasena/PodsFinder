@@ -1,25 +1,19 @@
-// src/pages/HomePage.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
 import PodsLogo from '../assets/images/PodsFinderHook.png';
 
-// Import data dan gambar dari podcastsData.js
 import { allPodcastsData, BerizikCover, Bapak2BangetCover, NightRide, PlaceholderImage } from '../data/podcastsData';
 
-// --- Komponen PodcastCard yang Ditingkatkan ---
-// Sekarang PodcastCard akan menerima seluruh objek podcast, membuatnya lebih fleksibel
 const PodcastCard = ({ podcast }) => (
-  // Link ke halaman detail podcast menggunakan ID uniknya
   <Link to={`/detail/${podcast.id}`} className="block p-4 bg-[#eae7b1] rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
     <div className="flex items-start gap-4">
       <img
-        src={podcast.coverImage || PlaceholderImage} // Gunakan coverImage dari data, fallback ke Placeholder
+        src={podcast.coverImage || PlaceholderImage} 
         alt={podcast.title}
         className="w-24 h-24 rounded-lg object-cover flex-shrink-0"
       />
       <div className="flex-grow">
         <h3 className="text-lg font-semibold text-[#3c6255] mb-1 leading-tight">{podcast.title}</h3>
-        {/* Menampilkan episode pertama atau fallback jika tidak ada */}
         <p className="text-sm text-[#3c6255] mb-1 leading-snug">
             {podcast.episodes && podcast.episodes.length > 0 ? podcast.episodes[0].title : 'No Episode Info'}
         </p>
@@ -29,7 +23,7 @@ const PodcastCard = ({ podcast }) => (
         </div>
       </div>
     </div>
-    <div className="gap-3 mt-4 grid grid-cols-2"> {/* Sesuaikan grid untuk 2 tombol */}
+    <div className="gap-3 mt-4 grid grid-cols-2"> 
       <button
         onClick={(e) => { e.preventDefault(); console.log(`Review button clicked for ID: ${podcast.id}`); }}
         className="flex-1 bg-[#3c6255] rounded-md h-8 text-[#EAE7B1] flex justify-center items-center hover:bg-[#2c4f43] transition-colors duration-300 text-sm px-2"
@@ -46,26 +40,21 @@ const PodcastCard = ({ podcast }) => (
   </Link>
 );
 
-// --- Komponen HomePage ---
 export const HomePage = () => {
-    // Tentukan genre yang ingin Anda tampilkan sebagai preview
-    const homepageGenreNames = ['Komedi', 'Horor']; // Sesuaikan dengan nama genre 1 kata yang Anda gunakan
+    const homepageGenreNames = ['Komedi', 'Horor']; 
 
-    // Buat struktur data yang mirip dengan 'genres' sebelumnya, tapi sekarang diisi dari allPodcastsData
     const featuredGenresData = homepageGenreNames.map(genreName => {
-        // Filter podcast yang cocok dengan genre ini
         const podcasts = allPodcastsData.filter(podcast =>
             podcast.info && podcast.info.genre && podcast.info.genre.toLowerCase() === genreName.toLowerCase()
         );
 
-        // Ambil hanya beberapa podcast (misalnya 2) untuk preview
         const limitedPodcasts = podcasts.slice(0, 2);
 
         return {
             name: genreName,
             podcasts: limitedPodcasts,
         };
-    }).filter(genre => genre.podcasts.length > 0); // Hanya tampilkan genre yang punya podcast
+    }).filter(genre => genre.podcasts.length > 0); 
 
   return (
     <div className="homepage pb-4 bg-[#EAE7B1]">
@@ -90,14 +79,12 @@ export const HomePage = () => {
 
         <hr className="border-t-2 border-[#3c6255] my-12" />
 
-        {/* Render featured genres dan podcastnya */}
         {featuredGenresData.map((genre, index) => (
           <div key={genre.name} className="mb-12">
             <div className="flex justify-between items-center mb-6 mt-10">
               <h2 className="text-[#3c6255] font-bold text-2xl md:text-2xl">
                 {genre.name}
               </h2>
-              {/* Pastikan ini mengarah ke URL genre yang benar, menggunakan encodeURIComponent jika ada karakter khusus */}
               <Link to={`/genreview/${encodeURIComponent(genre.name.toLowerCase())}`} className="flex items-center text-base text-[#3c6255] hover:underline">
                 View all <i className="ri-arrow-right-double-line ml-1"></i>
               </Link>
@@ -107,12 +94,11 @@ export const HomePage = () => {
               {genre.podcasts.map((podcast) => (
                 <PodcastCard
                   key={podcast.id}
-                  podcast={podcast} // Kirim seluruh objek podcast
+                  podcast={podcast} 
                 />
               ))}
             </div>
 
-            {/* Render hr hanya jika bukan genre terakhir */}
             {index < featuredGenresData.length - 1 && (
               <hr className="border-t-2 border-[#3c6255] my-12" />
             )}

@@ -1,9 +1,8 @@
-// src/components/AddPlaylist.jsx
+
 import React from 'react';
 
 export const AddPlaylist = ({ isOpen, onClose, playlists, onAddToPlaylist }) => {
-  if (!isOpen) return null; // Jangan render apa-apa jika pop-up tidak terbuka
-
+  if (!isOpen) return null; 
   return (
     <div className="fixed inset-0 bg-[#a6bb8d]/40 bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-[#eae7b1] p-6 rounded-lg shadow-xl w-80 max-w-sm border border-[#3c6255]">

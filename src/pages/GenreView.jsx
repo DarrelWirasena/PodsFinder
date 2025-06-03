@@ -1,14 +1,10 @@
-// src/pages/GenreView.jsx
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-
-// Impor allPodcastsData dan allGenresData dari file data yang sudah ada
 import { allPodcastsData, allGenresData, PlaceholderImage } from '../data/podcastsData';
 
 export const GenreView = () => {
   const { genreName } = useParams();
   console.log("1. genreName from URL:", genreName);
-  // Temukan data genre yang cocok
   const selectedGenre = allGenresData.find(
     (genre) => genre.name.toLowerCase() === genreName.toLowerCase()
   );
@@ -22,13 +18,10 @@ export const GenreView = () => {
     );
   }
 
-  // Filter podcast berdasarkan genre yang dipilih
   const genrePodcasts = allPodcastsData.filter(
     (podcast) => podcast.info.genre.toLowerCase() === selectedGenre.name.toLowerCase()
   );
-
   
-
   return (
     <div className="min-h-screen bg-[#eae7b1] pb-10">
       <div className="container mx-auto px-4 py-8">
@@ -42,9 +35,9 @@ export const GenreView = () => {
             genrePodcasts.map((podcast) => (
               <div key={podcast.id} className="bg-[#eae7b1] gap-4 p-4 rounded-lg shadow-md ml-8 mr-8">
                 <div className="flex items-start gap-4 mb-4">
-                  <Link to={`/detail/${podcast.id}`}> {/* Link to detail page */}
+                  <Link to={`/detail/${podcast.id}`}> 
                     <img
-                      src={podcast.coverImage || PlaceholderImage} // Use coverImage from podcastsData
+                      src={podcast.coverImage || PlaceholderImage} 
                       alt={podcast.title}
                       className="w-28 h-28 object-cover rounded-md flex-shrink-0"
                     />
@@ -54,7 +47,6 @@ export const GenreView = () => {
                     <Link to={`/detail/${podcast.id}`} className="hover:underline">
                       <h2 className="text-xl font-semibold text-[#3c6255] leading-tight">{podcast.title}</h2>
                     </Link>
-                    {/* Assuming the "episode" displayed here should be the latest/primary one, or just the title */}
                     <p className="text-base text-[#3c6255] mt-1">{podcast.episodes[0]?.title || 'No episode info'}</p>
                     <div className="flex items-center text-[#3c6255] mt-2">
                       <i className="ri-star-s-fill mr-1"></i>

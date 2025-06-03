@@ -1,12 +1,7 @@
-// src/pages/PlaylistViewAll.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from 'react-router-dom';
-
-// Ubah import PlaceholderImage ini!
-// Import PlaceholderImage dari file data terpusat Anda
-import { PlaceholderImage } from '../data/podcastsData'; // <-- DIUBAH DI SINI
-
-import { playlistsData } from '../data/playlistsData'; // Import data playlist
+import { PlaceholderImage } from '../data/podcastsData'; 
+import { playlistsData } from '../data/playlistsData'; 
 
 const PlaylistItem = ({
     episodeTitle,
@@ -19,7 +14,7 @@ const PlaylistItem = ({
     return (
         <div className="relative flex flex-col ml-8 mr-8 sm:flex-row items-start sm:items-center gap-4 p-4 bg-[#eae7b1] rounded-lg shadow-md flex-grow">
             <img
-                src={imageUrl || PlaceholderImage} // Tetap menggunakan PlaceholderImage sebagai fallback
+                src={imageUrl || PlaceholderImage} 
                 alt={episodeTitle}
                 className="w-28 h-28 rounded object-cover flex-shrink-0"
             />

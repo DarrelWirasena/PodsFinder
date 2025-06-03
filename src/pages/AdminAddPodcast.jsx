@@ -3,21 +3,16 @@ import React from 'react'
 export const AdminAddPodcast = () => {
   return (
     <div>
-      <div className="p-4 md:p-8 lg:p-12"> {/* Tambahkan padding ke container utama */}
-  {/* Header Section */}
-  <h1 className="text-3xl md:text-4xl font-bold text-[#3c6255] mb-4"> {/* Menggunakan h1 untuk semantik, ukuran teks responsif */}
+      <div className="p-4 md:p-8 lg:p-12"> 
+  <h1 className="text-3xl md:text-4xl font-bold text-[#3c6255] mb-4"> 
     Podcast Information
   </h1>
-  <hr className="border-t-2 border-[#3C6255] mb-8" /> {/* Menggunakan hr biasa untuk garis */}
+  <hr className="border-t-2 border-[#3C6255] mb-8" /> 
+  <div className="flex flex-col gap-6"> 
 
-  {/* Content Section - Menggunakan Flexbox untuk tata letak yang lebih baik */}
-  <div className="flex flex-col gap-6"> {/* Spasi vertikal antar grup elemen */}
-
-    {/* Podcast Details - Jika ini adalah pasangan label dan input/display, bisa diulang */}
-    {/* Contoh satu baris detail, Anda bisa mengulang div ini */}
-    <div className="flex flex-col gap-2"> {/* Grup label dan placeholder */}
+    <div className="flex flex-col gap-2"> 
       <p className="text-lg text-[#3c6255]">Podcast Title</p>
-      <input className="w-1/2 h-[50px] rounded-md bg-[#a6bb8d]/60" /> {/* Lebar penuh, tinggi tetap */}
+      <input className="w-1/2 h-[50px] rounded-md bg-[#a6bb8d]/60" /> 
     </div>
     <div className="flex flex-col gap-2">
       <p className="text-lg text-[#3c6255]">Date</p>
@@ -39,9 +34,7 @@ export const AdminAddPodcast = () => {
 
   </div>
 
-  {/* Action Buttons - Menggunakan Flexbox untuk mengatur tombol */}
-  <div className="flex flex-col sm:flex-row justify-start gap-4 mt-8"> {/* Tombol di bawah dan spasi di antara mereka */}
-    {/* Submit Button */}
+  <div className="flex flex-col sm:flex-row justify-start gap-4 mt-8"> 
     <button className="flex items-center justify-center gap-2 w-[100px] h-[35px] rounded-md bg-[#3c6255] text-[#eae7b1] text-base hover:opacity-90 transition-opacity">
       <img
         alt="Back"
@@ -57,7 +50,6 @@ export const AdminAddPodcast = () => {
       Submit
     </button>
 
-    {/* Back Button */}
    
   </div>
 </div>

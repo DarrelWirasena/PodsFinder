@@ -4,34 +4,34 @@ import podcastImage3 from '../assets/images/deddy.png';
 
 export const dataReviewed = [
   {
-    id: 'berizik-ep29', // Contoh ID yang disesuaikan
+    id: 'berizik-ep29', 
     image: podcastImage2,
     title: 'BERIZIK',
     episode: 'EP29: Last Playlist Berizik',
     rating: '4.5',
-    channelId: 'berizik-channel', // Contoh channelId yang disesuaikan
+    channelId: 'berizik-channel', 
     channelName: 'Berizik Podcast',
   },
   {
-    id: 'sport-1', // Contoh ID yang disesuaikan
+    id: 'sport-1', 
     image: podcastImage1,
     title: 'Analisis Pertandingan',
     episode: 'Pertandingan Liga 1',
     rating: '4.5',
-    channelId: 'dunia-olahraga-channel', // Contoh channelId yang disesuaikan
+    channelId: 'dunia-olahraga-channel', 
     channelName: 'DUNIA OLAHRAGA',
   },
   {
-    id: 'culture-1', // Contoh ID yang disesuaikan
+    id: 'culture-1', 
     image: podcastImage3,
     title: 'Tradisi Nusantara',
     episode: 'Mempelajari Tradisi Nusantara',
     rating: '4.5',
-    channelId: 'budaya-kita-channel', // Contoh channelId yang disesuaikan
+    channelId: 'budaya-kita-channel', 
     channelName: 'BUDAYA KITA',
   },
   {
-    id: 'social-drama-1', // Mengarah ke podcast yang sama dengan di atas
+    id: 'social-drama-1', 
     image: podcastImage3,
     title: 'Episode 1: Drama Kehidupan',
     episode: 'Episode 1: Drama Kehidupan',

@@ -1,15 +1,9 @@
-// src/pages/Detail.jsx
-import React, { useState, useEffect } from 'react'; // <-- Tambahkan useState
+import React, { useState, useEffect } from 'react'; 
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { playlistsData } from '../data/playlistsData';
-// Import data podcast dan juga gambar avatar yang diperlukan secara global
-// Pastikan semua impor ini benar dari file podsData Anda
-import { allPodcastsData, AvatarUser, AvatarMichelle, AvatarBram, AvatarFrans, PlaceholderImage } from '../data/podcastsData'; 
+import { allPodcastsData, AvatarMichelle, PlaceholderImage } from '../data/podcastsData'; 
+import { AddPlaylist } from '../components/AddPlaylist'; 
 
-// Impor komponen pop-up Anda
-import { AddPlaylist } from '../components/AddPlaylist'; // <-- Impor komponen pop-up
-
-// --- Komponen Pembantu (Tidak Berubah Signifikan) ---
 const EpisodeCard = ({ title, date, description }) => (
     <div className="w-full mb-8">
         <h3 className="text-lg font-semibold text-left text-[#3c6255] mb-1">
@@ -39,10 +33,10 @@ const ReviewCard = ({ avatarSrc, name, handle, reviewText }) => (
     </div>
 );
 
-const RelatedPodcastCard = ({ id, title, channel, coverSrc, rating, onAddToPlaylistClick }) => ( // <-- Tambahkan onAddToPlaylistClick
+const RelatedPodcastCard = ({ id, title, channel, coverSrc, rating, onAddToPlaylistClick }) => ( 
     <Link to={`/detail/${id}`} className="w-full bg-[#eae7b1] rounded-lg p-4 flex flex-col sm:flex-row items-start gap-4 shadow-md hover:shadow-lg transition-shadow duration-300">
         <div className="flex-shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded overflow-hidden">
-            <img src={coverSrc || PlaceholderImage} alt="Podcast Cover" className="w-full h-full object-cover"/> {/* Fallback for coverSrc */}
+            <img src={coverSrc || PlaceholderImage} alt="Podcast Cover" className="w-full h-full object-cover"/> 
         </div>
         <div className="flex-grow">
             <p className="text-sm text-left text-[#3c6255]">{channel}</p>
@@ -57,8 +51,8 @@ const RelatedPodcastCard = ({ id, title, channel, coverSrc, rating, onAddToPlayl
                 <button
                     className="flex items-center px-3 py-1 bg-[#3c6255] rounded-md shadow-md text-[#eae7b1] text-sm"
                     onClick={(e) => {
-                        e.preventDefault(); // Mencegah navigasi Link
-                        onAddToPlaylistClick(id); // Panggil fungsi dari Detail
+                        e.preventDefault(); 
+                        onAddToPlaylistClick(id); 
                     }}
                 >
                     <span className="text-base mr-1"><i className="ri-heart-3-fill"></i></span>
@@ -79,55 +73,47 @@ export const Detail = () => {
     const location = useLocation();
     const selectedPodcast = allPodcastsData.find(podcast => podcast.id === podcastId);
 
-    // State untuk mengelola pop-up AddPlaylist
     const [isAddPlaylistPopupOpen, setIsAddPlaylistPopupOpen] = useState(false);
-    const [podcastToAddId, setPodcastToAddId] = useState(null); // Menyimpan ID podcast yang akan ditambahkan
+    const [podcastToAddId, setPodcastToAddId] = useState(null); 
 
-    // Fungsi untuk membuka pop-up AddPlaylist
     const handleOpenAddPlaylistPopup = (id) => {
         setPodcastToAddId(id);
         setIsAddPlaylistPopupOpen(true);
     };
 
-    // Fungsi untuk menutup pop-up AddPlaylist
     const handleCloseAddPlaylistPopup = () => {
         setIsAddPlaylistPopupOpen(false);
         setPodcastToAddId(null);
     };
 
-    // Fungsi untuk menambahkan podcast ke playlist yang dipilih
     const handleAddToPlaylist = (playlistId) => {
         const podcastToAddToPlaylist = allPodcastsData.find(p => p.id === podcastToAddId);
         if (podcastToAddToPlaylist) {
             const targetPlaylist = playlistsData.find(p => p.id === playlistId);
             if (targetPlaylist) {
-                // Pastikan episode belum ada untuk menghindari duplikasi
                 const episodeExists = targetPlaylist.episodes.some(ep => ep.id === podcastToAddToPlaylist.id);
                 if (!episodeExists) {
                     targetPlaylist.episodes.push({
                         id: podcastToAddToPlaylist.id,
-                        image: podcastToAddToPlaylist.coverImage || PlaceholderImage, // Gunakan coverImage podcast sebagai image episode
-                        podcastTitle: podcastToAddToPlaylist.channel, // Judul podcast dari channel
-                        episodeTitle: podcastToAddToPlaylist.title, // Judul episode dari title podcast
+                        image: podcastToAddToPlaylist.image || PlaceholderImage, 
+                        podcastTitle: podcastToAddToPlaylist.channel, 
+                        episodeTitle: podcastToAddToPlaylist.title, 
                         rating: podcastToAddToPlaylist.rating
                     });
                     console.log(`Podcast "${podcastToAddToPlaylist.title}" berhasil ditambahkan ke "${targetPlaylist.title}"`);
-                    // Anda bisa menambahkan notifikasi/toast di sini
                 } else {
                     console.log(`Podcast "${podcastToAddToPlaylist.title}" sudah ada di "${targetPlaylist.title}"`);
-                    // Notifikasi bahwa podcast sudah ada
                 }
             }
         }
-        handleCloseAddPlaylistPopup(); // Selalu tutup pop-up setelah aksi
+        handleCloseAddPlaylistPopup(); 
     };
 
     useEffect(() => {
-        if (location.hash) { // Cek apakah ada hash di URL
-            const element = document.getElementById(location.hash.substring(1)); // Dapatkan elemen tanpa '#'
+        if (location.hash) { 
+            const element = document.getElementById(location.hash.substring(1)); 
             if (element) {
-                element.scrollIntoView({ behavior: 'smooth' }); // Scroll ke elemen tersebut
-                // Opsional: Fokuskan input setelah scroll
+                element.scrollIntoView({ behavior: 'smooth' }); 
                 element.focus(); 
             }
         }
@@ -151,8 +137,8 @@ export const Detail = () => {
 
                 <section className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-12">
                     <div className="relative w-full md:w-2/5 flex justify-center items-center">
-                        <img src={selectedPodcast.coverImage} alt={`${selectedPodcast.title} Background`} className="w-full h-auto max-h-[350px] object-cover rounded-lg opacity-50"/>
-                        <img src={selectedPodcast.coverImage} alt={`${selectedPodcast.title} Cover`} className="absolute inset-0 m-auto w-3/5 md:w-3/4 max-w-[173px] h-auto object-cover rounded-lg shadow-lg"/>
+                        <img src={selectedPodcast.image} alt={`${selectedPodcast.title} Background`} className="w-full h-auto max-h-[350px] object-cover rounded-lg opacity-50"/>
+                        <img src={selectedPodcast.image} alt={`${selectedPodcast.title} Cover`} className="absolute inset-0 m-auto w-3/5 md:w-3/4 max-w-[173px] h-auto object-cover rounded-lg shadow-lg"/>
                     </div>
 
                     <div className="w-full md:w-3/5 text-center md:text-left">
@@ -171,12 +157,11 @@ export const Detail = () => {
                         </p>
                         <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-6">
                             <div className="bg-transparent border-2 border-[#3c6255] rounded-md px-6 py-2 text-[#3c6255] flex items-center justify-center hover:bg-[#d0c69d] transition-colors duration-300 text-base"
-                            onClick={() => { // onClick should be a separate prop here
-                                // Target the element with ID 'add-review-input'
+                            onClick={() => { 
                                 const targetInput = document.getElementById('add-review-input');
                                 if (targetInput) {
-                                  targetInput.scrollIntoView({ behavior: 'smooth', block: 'center' }); // 'block: center' is often better for inputs
-                                  targetInput.focus(); // Optional: Automatically focus the input after scrolling
+                                  targetInput.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
+                                  targetInput.focus(); 
                                 }
                               }}
                             
@@ -185,7 +170,7 @@ export const Detail = () => {
                             </div>
                             <button
                                 className="bg-transparent border-2 border-[#3c6255] rounded-md px-6 py-2 text-[#3c6255] flex items-center justify-center hover:bg-[#d0c69d] transition-colors duration-300 text-base"
-                                onClick={() => handleOpenAddPlaylistPopup(selectedPodcast.id)} // <-- Panggil fungsi ini
+                                onClick={() => handleOpenAddPlaylistPopup(selectedPodcast.id)}
                             >
                                 <i className="ri-heart-3-fill mr-2"></i> Playlist
                             </button>
@@ -213,11 +198,10 @@ export const Detail = () => {
 
                 <div className="w-full border-b-2 border-[#3C6255] my-12"></div>
 
-                {/* --- Bagian Reviews --- */}
                 <section id="review-section" className="mb-12">
                     <div className="w-full p-6 bg-[#a6bb8d]/50 rounded-md overflow-hidden mb-6 flex items-center">
                         <div className="w-[70px] h-[70px] rounded-full overflow-hidden mr-4">
-                            <img src={AvatarUser} alt="User Avatar" className="w-full h-full object-cover"/>
+                            <img src={AvatarMichelle} alt="User Avatar" className="w-full h-full object-cover"/>
                         </div>
                         <input
                             id="add-review-input"
@@ -267,7 +251,7 @@ export const Detail = () => {
                                     channel={related.channel}
                                     coverSrc={related.coverSrc}
                                     rating={related.rating}
-                                    onAddToPlaylistClick={handleOpenAddPlaylistPopup} // <-- Pass fungsi ini ke RelatedPodcastCard
+                                    onAddToPlaylistClick={handleOpenAddPlaylistPopup} 
                                 />
                             ))
                         ) : (
@@ -325,12 +309,11 @@ export const Detail = () => {
                 </div>
             </div>
 
-            {/* Render komponen pop-up AddPlaylist */}
             <AddPlaylist
                 isOpen={isAddPlaylistPopupOpen}
                 onClose={handleCloseAddPlaylistPopup}
-                playlists={playlistsData} // Kirim data playlist ke pop-up
-                onAddToPlaylist={handleAddToPlaylist} // Kirim fungsi penambahan
+                playlists={playlistsData} 
+                onAddToPlaylist={handleAddToPlaylist} 
             />
         </div>
     );

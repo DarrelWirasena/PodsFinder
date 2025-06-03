@@ -1,16 +1,8 @@
-// src/pages/Playlist.jsx
 import React from "react";
 import { Link } from 'react-router-dom';
-
-// Import data playlist: Menggunakan alias 'allPlaylistsData' saat mengimpor
-// jika file 'playlistsData.js' mengekspor 'playlistsData'.
-import { playlistsData as allPlaylistsData } from '../data/playlistsData'; 
-
-// Import PlaceholderImage: Pastikan file '../data/podcastsData' ada
-// dan mengekspor 'PlaceholderImage'.
+import { playlistsData } from '../data/playlistsData'; 
 import { PlaceholderImage } from '../data/podcastsData'; 
 
-// --- Komponen PlaylistSectionHeader dan EpisodeItemCard (Tidak Berubah) ---
 const PlaylistSectionHeader = ({ title, linkTo = '#' }) => (
     <div className="flex ml-8 justify-between items-center mb-4">
         <h2 className="text-2xl md:text-3xl font-medium text-left text-[#3c6255]">{title}</h2>
@@ -21,33 +13,48 @@ const PlaylistSectionHeader = ({ title, linkTo = '#' }) => (
     </div>
 );
 
-const EpisodeItemCard = ({ image, podcastTitle, episodeTitle, rating, onTriggerConfirm, episodeId }) => (
-    <div className="relative flex flex-col ml-8 mr-8 sm:flex-row items-start sm:items-center gap-4 p-4 bg-[#eae7b1] rounded-lg shadow-md">
-        <img src={image || PlaceholderImage} alt="Episode Cover" className="w-28 h-28 rounded object-cover flex-shrink-0" />
-        <div className="flex-grow">
-            <p className="text-base text-[#3c6255] mb-1">{podcastTitle}</p>
-            <h3 className="text-lg font-semibold text-[#3c6255] mb-2">{episodeTitle}</h3>
-            <div className="flex items-center text-[#3c6255]">
-                <p className="text-base leading-none">{rating}</p>
-                <i className="ri-star-s-fill text-base leading-none ml-1"></i>
+const EpisodeItemCard = ({ image, channel, title, rating, onTriggerConfirm, episodeId, podcastId, channelId }) => (
+    <Link to={`/detail/${podcastId}`} className="block">
+        <div className="relative flex flex-col ml-8 mr-8 sm:flex-row items-start sm:items-center gap-4 p-4 bg-[#eae7b1] rounded-lg shadow-md">
+            <img src={image || PlaceholderImage} alt="Episode Cover" className="w-28 h-28 rounded object-cover flex-shrink-0" />
+            <div className="flex-grow">
+                <p className="text-base text-[#3c6255] mb-1">{channel}</p>
+                <h3 className="text-lg font-semibold text-[#3c6255] mb-2">{title}</h3>
+                <div className="flex items-center text-[#3c6255]">
+                    <p className="text-base leading-none">{rating}</p>
+                    <i className="ri-star-s-fill text-base leading-none ml-1"></i>
+                </div>
+                {channelId && channel && ( 
+                    <Link
+                        to={`/detailchannel/${channelId}`} 
+                        className="text-sm text-[#3c6255] mt-2 hover:underline hover:text-[#2c4f43] transition-colors"
+                        onClick={(e) => e.stopPropagation()} 
+                    >
+                        Channel: {channel} <i className="ri-share-box-line ml-1"></i>
+                    </Link>
+                )}
             </div>
-        </div>
 
-        <button
-            className="
-                absolute top-0 right-0 p-2 z-10
-                text-2xl text-[#3c6255]
-                cursor-pointer transition-colors duration-200 hover:text-red-500
-                md:static md:ml-auto md:p-0 md:text-xl
-                ri-delete-bin-fill
-            "
-            onClick={() => onTriggerConfirm(episodeId)}
-        >
-        </button>
-    </div>
+            <button
+                className="
+                    absolute top-0 right-0 p-2 z-10
+                    text-2xl text-[#3c6255]
+                    cursor-pointer transition-colors duration-200 hover:text-red-500
+                    md:static md:ml-auto md:p-0 md:text-xl
+                    ri-delete-bin-fill
+                "
+                onClick={(e) => {
+                    e.preventDefault(); 
+                    e.stopPropagation(); 
+                    onTriggerConfirm(episodeId);
+                }}
+            >
+            </button>
+        </div>
+    </Link>
 );
 
-export const Playlist = ({onTriggerConfirm}) => {
+export const Playlist = ({ onTriggerConfirm }) => {
     return (
         <div className='min-h-screen bg-[#eae7b1] p-4 md:p-8 pt-24'>
             <div className="container mx-auto">
@@ -57,23 +64,24 @@ export const Playlist = ({onTriggerConfirm}) => {
                 </div>
 
                 <div className="space-y-12">
-                    {allPlaylistsData.map((playlist) => (
+                    {playlistsData.map((playlist) => (
                         <div key={playlist.id}>
                             <PlaylistSectionHeader
                                 title={playlist.title}
-                                linkTo={`/playlistviewall/${playlist.id}`} 
+                                linkTo={`/playlistviewall/${playlist.id}`}
                             />
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {/* HANYA RENDER 2 EPISODE TERATAS MENGGUNAKAN .slice(0, 2) */}
-                                {playlist.episodes.slice(0, 2).map((episode) => ( 
+                                {playlist.episodes.slice(0, 2).map((episode) => (
                                     <EpisodeItemCard
                                         key={episode.id}
                                         image={episode.image}
-                                        podcastTitle={episode.podcastTitle}
-                                        episodeTitle={episode.episodeTitle}
+                                        channel={episode.channel}
+                                        title={episode.title}
                                         rating={episode.rating}
                                         onTriggerConfirm={onTriggerConfirm}
                                         episodeId={episode.id}
+                                        podcastId={episode.podcastId}
+                                        channelId={episode.channelId}
                                     />
                                 ))}
                             </div>
