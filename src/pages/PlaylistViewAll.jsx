@@ -14,8 +14,9 @@ const PlaylistItem = ({
     channelId 
 }) => {
     return (
-        <Link to={`/detail/${podcastId}`} className="block">
+        <div className="block">
             <div className="relative flex flex-col ml-8 mr-8 sm:flex-row items-start sm:items-center gap-4 p-4 bg-[#eae7b1] rounded-lg shadow-md flex-grow hover:shadow-lg transition-shadow duration-300">
+            
                 <img
                     src={imageUrl || PlaceholderImage}
                     alt={title}
@@ -23,6 +24,7 @@ const PlaylistItem = ({
                 />
 
                 <div className="ml-4 flex-grow text-[#3c6255]">
+                <Link to={`/detail/${podcastId}`} className="block">
                     <p className="text-base mb-1">{channel}</p>
                     <h3 className="text-lg font-semibold leading-tight mt-1 mb-2">
                         {title}
@@ -31,6 +33,7 @@ const PlaylistItem = ({
                         <p className="text-base leading-none">{rating}</p>
                         <i alt="Star rating" className="ri-star-s-fill text-base leading-none ml-1" />
                     </div>
+                    </Link>
                     {channelId && channel && ( 
                         <Link
                             to={`/detailchannel/${channelId}`}
@@ -58,7 +61,7 @@ const PlaylistItem = ({
                 >
                 </button>
             </div>
-        </Link>
+        </div>
     );
 };
 
