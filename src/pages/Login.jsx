@@ -26,13 +26,7 @@ export const Login = () => {
             placeholder="Enter your password"
           />
         </div>
-        <div className="flex justify-between items-center mb-4">
-          <label className="flex items-center">
-            <input type="checkbox" className="mr-2" />
-            <span className="text-base text-[#3c6255]">Remember me</span>
-          </label>
-          <a href="#" className="text-base text-[#3c6255]">Forgot password?</a>
-        </div>
+      
         <button className="w-full h-12 rounded-md bg-[#3c6255] text-[#eae7b1] font-semibold">
           LOGIN
         </button>

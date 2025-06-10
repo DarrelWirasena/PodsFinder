@@ -38,10 +38,10 @@ export const SignUp = () => {
           />
         </div>
         
-        <div className="flex items-center mb-4">
+        {/* <div className="flex items-center mb-4">
           <input type="checkbox" className="mr-2" />
           <label className="text-base text-[#3c6255]">I agree to the Terms & Conditions</label>
-        </div>
+        </div> */}
         
         <button className="w-full h-12 rounded-md bg-[#3c6255] text-[#eae7b1] font-semibold mb-4">
           SIGN UP

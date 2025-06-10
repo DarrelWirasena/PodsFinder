@@ -198,37 +198,6 @@ export const Detail = () => {
 
                 <div className="w-full border-b-2 border-[#3C6255] my-12"></div>
 
-                <section id="review-section" className="mb-12">
-                    <div className="w-full p-6 bg-[#a6bb8d]/50 rounded-md overflow-hidden mb-6 flex items-center">
-                        <div className="w-[70px] h-[70px] rounded-full overflow-hidden mr-4">
-                            <img src={AvatarMichelle} alt="User Avatar" className="w-full h-full object-cover"/>
-                        </div>
-                        <input
-                            id="add-review-input"
-                            className="flex-grow text-base text-left text-[#3c6255]/90 p-2 rounded-md bg-transparent border-none focus:outline-none"
-                            placeholder='Add a review...'
-                        />
-                    </div>
-
-                    <div className="flex flex-col">
-                        {selectedPodcast.reviews.length > 0 ? (
-                            selectedPodcast.reviews.map((review, index) => (
-                                <ReviewCard
-                                    key={index}
-                                    avatarSrc={review.avatarSrc}
-                                    name={review.name}
-                                    handle={review.handle}
-                                    reviewText={review.reviewText}
-                                />
-                            ))
-                        ) : (
-                            <p className="text-base text-left text-[#3c6255]">Belum ada review untuk podcast ini.</p>
-                        )}
-                    </div>
-                </section>
-
-                <div className="w-full border-b-2 border-[#3C6255] my-12"></div>
-
                 <section className="mb-12">
                     <div className="flex justify-between items-end mb-6">
                         <h2 className="text-2xl font-semibold text-left text-[#3c6255]">
@@ -259,6 +228,37 @@ export const Detail = () => {
                         )}
                     </div>
                 </section>
+
+                <div className="w-full border-b-2 border-[#3C6255] my-12"></div>
+                <section id="review-section" className="mb-12">
+                    <div className="w-full p-6 bg-[#a6bb8d]/50 rounded-md overflow-hidden mb-6 flex items-center">
+                        <div className="w-[70px] h-[70px] rounded-full overflow-hidden mr-4">
+                            <img src={AvatarMichelle} alt="User Avatar" className="w-full h-full object-cover"/>
+                        </div>
+                        <input
+                            id="add-review-input"
+                            className="flex-grow text-base text-left text-[#3c6255]/90 p-2 rounded-md bg-transparent border-none focus:outline-none"
+                            placeholder='Add a review...'
+                        />
+                    </div>
+
+                    <div className="flex flex-col">
+                        {selectedPodcast.reviews.length > 0 ? (
+                            selectedPodcast.reviews.map((review, index) => (
+                                <ReviewCard
+                                    key={index}
+                                    avatarSrc={review.avatarSrc}
+                                    name={review.name}
+                                    handle={review.handle}
+                                    reviewText={review.reviewText}
+                                />
+                            ))
+                        ) : (
+                            <p className="text-base text-left text-[#3c6255]">Belum ada review untuk podcast ini.</p>
+                        )}
+                    </div>
+                </section>
+               
 
                 <div className="w-full border-b-2 border-[#3C6255] my-12"></div>
 

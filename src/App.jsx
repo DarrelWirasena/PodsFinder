@@ -21,7 +21,7 @@ import { Profil } from "./pages/Profil";
 
 function App() {
   const location = useLocation();
-  var yaa = 2;
+  var yaa = 1;
     
     const showNavbar = location.pathname !== "/login" && location.pathname !== "/signup";
     const WhichNavG = showNavbar&&yaa==1;
