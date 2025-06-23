@@ -17,6 +17,10 @@ class ReviewedPodcastController extends Controller
      */
     public function index($userId)
     {
+        if (auth()->id() !== $user->id) {
+            return response()->json(['message' => 'Forbidden'], Response::HTTP_FORBIDDEN);
+        }
+
         $podcasts = Podcast::whereHas('reviews', function ($query) use ($userId) {
             $query->where('user_id', $userId);
         })->distinct()->get();
