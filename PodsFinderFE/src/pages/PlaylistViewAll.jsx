@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
+import axiosClient from '../axios-client';
 import { useParams, Link } from 'react-router-dom';
 import { PlaceholderImage } from '../data/podcastsData';
 import { playlistsData } from '../data/playlistsData'; 
@@ -69,6 +70,13 @@ export const PlaylistViewAll = ({ onTriggerConfirm }) => {
     const { playlistId } = useParams();
     const selectedPlaylist = playlistsData.find(p => p.id === playlistId);
 
+    const {user,token,setUser,setToken}=useStateContext() 
+  useEffect(() => {
+    axiosClient.get('/user')
+        .then(({data}) => {
+          setUser(data)
+        })
+    }, [])
     if (!selectedPlaylist) {
         return (
             <div className='min-h-screen bg-[#eae7b1] p-4 md:p-8 flex flex-col items-center justify-center pt-24'>

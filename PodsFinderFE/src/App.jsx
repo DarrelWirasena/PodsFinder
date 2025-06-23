@@ -56,8 +56,9 @@ function App() {
     setIsConfirm(false);
     setActionToPerform(null); 
   };
-
+  
   return (
+    
     <div className="flex flex-col min-h-screen"> 
       {WhichNavG && (<Navbar onSearchClick={handleOpenSearchOverlay}/>)}
       {WhichNavU && (<NavbarUser onSearchClick={handleOpenSearchOverlay}/>)}

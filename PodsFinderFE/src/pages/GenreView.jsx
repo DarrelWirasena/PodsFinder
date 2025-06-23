@@ -1,9 +1,18 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axiosClient from '../axios-client';
 import { useParams, Link } from 'react-router-dom';
 import { allPodcastsData, allGenresData, PlaceholderImage } from '../data/podcastsData';
+import { useStateContext } from '../contexts/ContextsPorvider';
 
 export const GenreView = () => {
   const { genreName } = useParams();
+  const {user,token,setUser,setToken}=useStateContext() 
+  useEffect(() => {
+    axiosClient.get('/user')
+        .then(({data}) => {
+          setUser(data)
+        })
+    }, [])
   console.log("1. genreName from URL:", genreName);
   const selectedGenre = allGenresData.find(
     (genre) => genre.name.toLowerCase() === genreName.toLowerCase()

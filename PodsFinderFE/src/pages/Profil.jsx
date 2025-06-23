@@ -111,7 +111,7 @@ export const Profil = () => {
         <div className='flex justify-between items-start mb-10'>
           <UserProfile
             profileImage={currentUser.profileImage}
-            username={currentUser.username}
+            username={user.name}
             handle={currentUser.handle}
             onClick={() => setIsEditOpen(true)} 
           />

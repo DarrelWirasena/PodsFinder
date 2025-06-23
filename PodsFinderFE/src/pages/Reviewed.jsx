@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axiosClient from '../axios-client';
 import { Link, Navigate } from 'react-router-dom';
 import { dataReviewed } from '../data/dataReviewed'; 
 import { useStateContext } from '../contexts/ContextsPorvider';
 
-const ReviewedPodcastCard = ({ id, image, title, episode, rating, channelId, channelName }) => { 
+const ReviewedPodcastCard = ({ id, image, title, episode, rating, channelId, channelName }) => {
+  const {user,token,setUser,setToken}=useStateContext() 
+  useEffect(() => {
+    axiosClient.get('/user')
+        .then(({data}) => {
+          setUser(data)
+        })
+    }, [])
   return (
     <Link to={`/detail/${id}`} className="block"> 
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 p-4 rounded-lg mb-4 bg-[#EAE7B1]/20 shadow-md hover:shadow-lg transition-shadow duration-300"> 

@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useEffect, useState } from 'react';
+import axiosClient from '../axios-client';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { playlistsData } from '../data/playlistsData';
 import { allPodcastsData, AvatarMichelle, PlaceholderImage } from '../data/podcastsData'; 
 import { AddPlaylist } from '../components/AddPlaylist'; 
+import { useStateContext } from '../contexts/ContextsPorvider';
 
 const EpisodeCard = ({ title, date, description }) => (
     <div className="w-full mb-8">
@@ -72,6 +74,13 @@ export const Detail = () => {
     const { podcastId } = useParams();
     const location = useLocation();
     const selectedPodcast = allPodcastsData.find(podcast => podcast.id === podcastId);
+    const {user,token,setUser,setToken}=useStateContext() 
+  useEffect(() => {
+    axiosClient.get('/user')
+        .then(({data}) => {
+          setUser(data)
+        })
+    }, [])
 
     const [isAddPlaylistPopupOpen, setIsAddPlaylistPopupOpen] = useState(false);
     const [podcastToAddId, setPodcastToAddId] = useState(null); 

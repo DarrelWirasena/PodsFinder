@@ -20,6 +20,7 @@ class AuthController extends Controller
                     'name' => $data['name'],
                     'email' => $data['email'],
                     'password' => bcrypt($data['password']),
+                    'img_url' => 'storage/profile/default.webp',
                ]);
         $token = $user->createToken('main')->plainTextToken;
         
@@ -36,7 +37,7 @@ class AuthController extends Controller
         if(!Auth::attempt($credentials)){
             return response([
                 'message' => 'Provided email address or password is incorrect'
-            ]);
+            ],422);
         }
         /** @var \App\Models\User $user */
         $user = Auth::user();

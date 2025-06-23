@@ -10,6 +10,28 @@ use App\Models\User;
 
 class UserController extends Controller
 {
+
+    public function updateProfileImage(Request $request)
+    {
+        $request->validate([
+            'img' => 'required|image|mimes:webp,jpg,jpeg,png|max:2048',
+        ]);
+
+        $user = $request->user();
+
+        $path = $request->file('img')->store('profile', 'public');
+
+        // Optional: Hapus gambar lama jika bukan default
+        if ($user->img_url && $user->img_url !== 'storage/profile/defaultPP.webp') {
+            \Storage::disk('public')->delete(str_replace('storage/', '', $user->img_url));
+        }
+
+        $user->img_url = 'storage/' . $path;
+        $user->save();
+
+        return new UserResource($user);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -75,5 +97,15 @@ class UserController extends Controller
         $user->delete();
 
         return response("", 204);
+    }
+
+    public function toArray($request): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'email' => $this->email,
+            'img_url' => $this->img_url, // tambahkan ini
+        ];
     }
 }

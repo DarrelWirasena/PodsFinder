@@ -1,7 +1,8 @@
-import React, { useRef } from 'react';
+import React, { useRef , useState} from 'react';
 import axiosClient from '../axios-client';
 import { useStateContext } from '../contexts/ContextsPorvider';
 import { Navigate } from 'react-router-dom';
+
 
 export const SignUp = () => {
 
@@ -9,6 +10,7 @@ export const SignUp = () => {
   const emailRef = useRef();
   const passwordRef = useRef();
   const passwordConfirmationRef = useRef();
+  const [errors, setErrors] = useState(null)
 
   const {setUser, setToken} = useStateContext()
   const {token}= useStateContext();
@@ -27,12 +29,11 @@ export const SignUp = () => {
       setToken(data.token)
     })
     .catch(err => {
-      console.log(err);
-      const response = err.response;
-      if (response && response.status == 422){
-        console.log(response.data.errors);
-      }
-    })
+        const response = err.response;
+        if (response && response.status === 422) {
+          setErrors(response.data.errors)
+        }
+      })
   }
   if (!token){
 
@@ -49,6 +50,14 @@ export const SignUp = () => {
           Already have an account? <a href="/login" className="text-[#3c6255] underline">Login</a>
         </p>
         
+          {errors &&
+            <p className="alert">
+              {Object.keys(errors).map(key => (
+                <p key={key}>{errors[key][0]}</p>
+              ))}
+            </p>
+          }
+
         <form onSubmit={onSubmit}>
         <div className="mb-4">
           <label className="block text-base text-[#3c6255] mb-1">Username</label>
@@ -95,18 +104,7 @@ export const SignUp = () => {
           SIGN UP
         </button>
         </form>
-        <p className="text-center text-base text-[#3c6255] mb-4">---- or register with ----</p>
-        
-        <div className="flex justify-around">
-          <div className="flex items-center">
-            <img src="google.png" alt="Google" className="w-5 h-5 mr-2" />
-            <span className="text-base text-[#eae7b1]">Google</span>
-          </div>
-          <div className="flex items-center">
-            <img src="apple-inc.png" alt="Apple" className="w-5 h-5 mr-2" />
-            <span className="text-base text-[#eae7b1]">Apple</span>
-          </div>
-        </div>
+               
       </div>
     </div>
   );

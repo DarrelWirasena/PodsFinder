@@ -1,8 +1,10 @@
-import React, { useState } from 'react'; 
+import React, { useEffect, useState } from 'react';
+import axiosClient from '../axios-client';
 import { Link } from 'react-router-dom';
 import { allPodcastsData, allGenresData, PlaceholderImage } from '../data/podcastsData'; 
 import { AddPlaylist } from '../components/AddPlaylist'; 
 import { playlistsData } from '../data/playlistsData'; 
+import { useStateContext } from '../contexts/ContextsPorvider';
 
 const PodcastCard = ({ id, image, title, channel, episode, rating, onAddToPlaylistClick }) => ( 
   <div className="block p-4 bg-[#eae7b1] rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
@@ -48,6 +50,13 @@ const PodcastCard = ({ id, image, title, channel, episode, rating, onAddToPlayli
 export const Genre = () => {
   const [isAddPlaylistPopupOpen, setIsAddPlaylistPopupOpen] = useState(false);
   const [podcastToAddId, setPodcastToAddId] = useState(null); 
+  const {user,token,setUser,setToken}=useStateContext() 
+  useEffect(() => {
+    axiosClient.get('/user')
+        .then(({data}) => {
+          setUser(data)
+        })
+    }, [])
 
   const handleOpenAddPlaylistPopup = (id) => {
     setPodcastToAddId(id);

@@ -1,9 +1,10 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import axiosClient from '../axios-client';
 import { useStateContext } from '../contexts/ContextsPorvider';
 import { Navigate } from 'react-router-dom';
 
 export const Login = () => {
+  const [message, setMessage] = useState(null)
   const {token, setUser, setToken}= useStateContext()
   const emailRef = useRef();
   const passwordRef = useRef();
@@ -20,13 +21,12 @@ export const Login = () => {
       setUser(data.user)
       setToken(data.token)
     })
-    .catch(err => {
-      console.log(err);
-      const response = err.response;
-      if (response && response.status == 422){
-        console.log(response.data.errors);
-      }
-    })
+    .catch((err) => {
+        const response = err.response;
+        if (response && response.status === 422) {
+          setMessage(response.data.message)
+        }
+      })
 
   }
     
@@ -44,6 +44,13 @@ export const Login = () => {
         <p className="text-2xl font-semibold text-center text-[#3c6255] mb-6">
           Welcome back!
         </p>
+
+        {message &&
+            <div className="alert">
+              <p>{message}</p>
+            </div>
+          }
+
         <form onSubmit={onSubmit}>
         <div className="mb-4">
           <label className="block text-base text-[#3c6255] mb-1">Email</label>

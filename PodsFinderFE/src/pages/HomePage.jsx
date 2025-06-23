@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axiosClient from '../axios-client';
 import { Link } from 'react-router-dom';
 import PodsLogo from '../assets/images/PodsFinderHook.png';
 
 import { allPodcastsData, BerizikCover, Bapak2BangetCover, NightRide, PlaceholderImage } from '../data/podcastsData';
+import { useStateContext } from '../contexts/ContextsPorvider';
 
 const PodcastCard = ({ podcast }) => (
   <Link to={`/detail/${podcast.id}`} className="block p-4 bg-[#eae7b1] rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
@@ -41,8 +43,14 @@ const PodcastCard = ({ podcast }) => (
 );
 
 export const HomePage = () => {
+    const {user,token,setUser,setToken}=useStateContext()
     const homepageGenreNames = ['Komedi', 'Horor']; 
-
+    useEffect(() => {
+      axiosClient.get('/user')
+        .then(({data}) => {
+          setUser(data)
+        })
+  }, [])
     const featuredGenresData = homepageGenreNames.map(genreName => {
         const podcasts = allPodcastsData.filter(podcast =>
             podcast.info && podcast.info.genre && podcast.info.genre.toLowerCase() === genreName.toLowerCase()

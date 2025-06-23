@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from 'react';
+import axiosClient from '../axios-client';
 import { Link } from 'react-router-dom';
 import { playlistsData } from '../data/playlistsData'; 
 import { PlaceholderImage } from '../data/podcastsData'; 
+import { useStateContext } from '../contexts/ContextsPorvider';
 
 const PlaylistSectionHeader = ({ title, linkTo = '#' }) => (
     <div className="flex ml-8 justify-between items-center mb-4">
@@ -55,6 +57,13 @@ const EpisodeItemCard = ({ image, channel, title, rating, onTriggerConfirm, epis
 );
 
 export const Playlist = ({ onTriggerConfirm }) => {
+    const {user,token,setUser,setToken}=useStateContext() 
+  useEffect(() => {
+    axiosClient.get('/user')
+        .then(({data}) => {
+          setUser(data)
+        })
+    }, [])
     return (
         <div className='min-h-screen bg-[#eae7b1] p-4 md:p-8 pt-24'>
             <div className="container mx-auto">

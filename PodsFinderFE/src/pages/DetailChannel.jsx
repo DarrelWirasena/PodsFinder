@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axiosClient from '../axios-client';
 import { useParams, Link } from 'react-router-dom';
 import { allChannelsData, allPodcastsData, PlaceholderImage } from '../data/podcastsData'; 
+import { useStateContext } from '../contexts/ContextsPorvider';
 
 const BackButton = () => (
   <Link to="/genre" className="flex items-center px-4 py-2 bg-[#3c6255] rounded-md shadow-md text-[#eae7b1] text-base hover:bg-[#3c6255]/90 transition-colors">
@@ -71,6 +73,14 @@ export const DetailChannel = () => {
   const { channelId } = useParams();
 
   const selectedChannel = allChannelsData.find(channel => channel.id === channelId);
+
+  const {user,token,setUser,setToken}=useStateContext() 
+  useEffect(() => {
+    axiosClient.get('/user')
+        .then(({data}) => {
+          setUser(data)
+        })
+    }, [])
 
   if (!selectedChannel) {
     return (
