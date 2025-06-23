@@ -11,7 +11,7 @@ const BackButton = () => (
   </Link>
 );
 
-const ChannelHeader = ({ bannerSrc, avatarSrc, channelName, creatorName, rating }) => (
+const ChannelHeader = ({ bannerSrc, avatarSrc, channelName, creatorName }) => (
   <div className="relative w-full h-[250px] md:h-[400px] overflow-hidden rounded-lg mb-8">
     <img
       src={bannerSrc}
@@ -34,12 +34,6 @@ const ChannelHeader = ({ bannerSrc, avatarSrc, channelName, creatorName, rating 
           <p className="text-lg md:text-xl text-white opacity-90 mb-2">
             {creatorName}
           </p>
-          <div className="flex items-center text-white">
-            <p className="text-2xl mr-1">{rating}</p>
-            <span className="text-2xl">
-              <i className="ri-star-s-fill"></i>
-            </span>
-          </div>
         </div>
       </div>
       <div className="flex justify-between items-center mt-4">
@@ -48,7 +42,7 @@ const ChannelHeader = ({ bannerSrc, avatarSrc, channelName, creatorName, rating 
   </div>
 );
 
-const ChannelPodcastCard = ({ id, coverSrc, title, rating }) => (
+const ChannelPodcastCard = ({ id, coverSrc, title }) => (
   <Link to={`/detail/${id}`} className="bg-[#eae7b1] rounded-lg shadow-md overflow-hidden p-4 flex flex-col items-center text-center hover:shadow-lg transition-shadow duration-300">
     <img
       src={coverSrc || PlaceholderImage} 
@@ -58,12 +52,6 @@ const ChannelPodcastCard = ({ id, coverSrc, title, rating }) => (
     <h3 className="text-base font-semibold text-[#3c6255] mb-1">
       {title}
     </h3>
-    <div className="flex items-center text-[#3c6255]">
-      <p className="text-base mr-1">{rating}</p>
-      <span className="text-base">
-        <i className="ri-star-s-fill"></i>
-      </span>
-    </div>
   </Link>
 );
 
@@ -97,7 +85,6 @@ export const DetailChannel = () => {
           avatarSrc={selectedChannel.coverImage || PlaceholderImage} 
           channelName={selectedChannel.name} 
           creatorName={selectedChannel.creator} 
-          rating={selectedChannel.subscribers} 
         />
 
         <div className="w-full border-b-2 border-[#3C6255] my-12"></div>
@@ -127,7 +114,6 @@ export const DetailChannel = () => {
                         id={podcast.id}
                         coverSrc={podcast.coverImage} 
                         title={podcast.title}
-                        rating={podcast.rating}
                     />
                 ))
             ) : (
