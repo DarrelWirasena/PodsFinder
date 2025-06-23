@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react'; 
+// src/pages/Detail.jsx
+
+import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { playlistsData } from '../data/playlistsData';
-import { allPodcastsData, AvatarMichelle, PlaceholderImage } from '../data/podcastsData'; 
-import { AddPlaylist } from '../components/AddPlaylist'; 
+// Pastikan AvatarUser juga diimpor jika ingin menggunakan avatar berbeda untuk reviewer yang baru
+import { allPodcastsData, AvatarMichelle, PlaceholderImage } from '../data/podcastsData'; // <-- Tambahkan AvatarUser
+import { AddPlaylist } from '../components/AddPlaylist';
 
 const EpisodeCard = ({ title, date, description }) => (
     <div className="w-full mb-8">
@@ -33,10 +36,10 @@ const ReviewCard = ({ avatarSrc, name, handle, reviewText }) => (
     </div>
 );
 
-const RelatedPodcastCard = ({ id, title, channel, coverSrc, rating, onAddToPlaylistClick }) => ( 
+const RelatedPodcastCard = ({ id, title, channel, coverSrc, rating, onAddToPlaylistClick }) => (
     <Link to={`/detail/${id}`} className="w-full bg-[#eae7b1] rounded-lg p-4 flex flex-col sm:flex-row items-start gap-4 shadow-md hover:shadow-lg transition-shadow duration-300">
         <div className="flex-shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded overflow-hidden">
-            <img src={coverSrc || PlaceholderImage} alt="Podcast Cover" className="w-full h-full object-cover"/> 
+            <img src={coverSrc || PlaceholderImage} alt="Podcast Cover" className="w-full h-full object-cover"/>
         </div>
         <div className="flex-grow">
             <p className="text-sm text-left text-[#3c6255]">{channel}</p>
@@ -51,14 +54,21 @@ const RelatedPodcastCard = ({ id, title, channel, coverSrc, rating, onAddToPlayl
                 <button
                     className="flex items-center px-3 py-1 bg-[#3c6255] rounded-md shadow-md text-[#eae7b1] text-sm"
                     onClick={(e) => {
-                        e.preventDefault(); 
-                        onAddToPlaylistClick(id); 
+                        e.preventDefault();
+                        onAddToPlaylistClick(id);
                     }}
                 >
                     <span className="text-base mr-1"><i className="ri-heart-3-fill"></i></span>
                     Playlist
                 </button>
-                <button className="flex items-center px-3 py-1 bg-[#3c6255] rounded-md shadow-md text-[#eae7b1] text-sm">
+                <button
+                    className="flex items-center px-3 py-1 bg-[#3c6255] rounded-md shadow-md text-[#eae7b1] text-sm"
+                    onClick={(e) => {
+                        e.preventDefault(); // Mencegah navigasi Link
+                        document.getElementById('add-review-input').focus();
+                        document.getElementById('add-review-input').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }}
+                >
                     <span className="text-base mr-1"><i className="ri-edit-2-line"></i></span>
                     Review
                 </button>
@@ -73,8 +83,21 @@ export const Detail = () => {
     const location = useLocation();
     const selectedPodcast = allPodcastsData.find(podcast => podcast.id === podcastId);
 
+    // State untuk mengelola review yang ditampilkan secara lokal
+    const [reviews, setReviews] = useState([]);
+    // State untuk input review baru
+    const [newReviewText, setNewReviewText] = useState('');
+
     const [isAddPlaylistPopupOpen, setIsAddPlaylistPopupOpen] = useState(false);
-    const [podcastToAddId, setPodcastToAddId] = useState(null); 
+    const [podcastToAddId, setPodcastToAddId] = useState(null);
+
+    // Mengisi state 'reviews' saat komponen dimuat atau podcast berubah
+    useEffect(() => {
+        if (selectedPodcast) {
+            // Pastikan Anda membuat salinan array reviews agar tidak memodifikasi data asli
+            setReviews([...selectedPodcast.reviews]);
+        }
+    }, [selectedPodcast]);
 
     const handleOpenAddPlaylistPopup = (id) => {
         setPodcastToAddId(id);
@@ -95,9 +118,9 @@ export const Detail = () => {
                 if (!episodeExists) {
                     targetPlaylist.episodes.push({
                         id: podcastToAddToPlaylist.id,
-                        image: podcastToAddToPlaylist.image || PlaceholderImage, 
-                        podcastTitle: podcastToAddToPlaylist.channel, 
-                        episodeTitle: podcastToAddToPlaylist.title, 
+                        image: podcastToAddToPlaylist.image || PlaceholderImage,
+                        podcastTitle: podcastToAddToPlaylist.channel,
+                        episodeTitle: podcastToAddToPlaylist.title,
                         rating: podcastToAddToPlaylist.rating
                     });
                     console.log(`Podcast "${podcastToAddToPlaylist.title}" berhasil ditambahkan ke "${targetPlaylist.title}"`);
@@ -106,15 +129,36 @@ export const Detail = () => {
                 }
             }
         }
-        handleCloseAddPlaylistPopup(); 
+        handleCloseAddPlaylistPopup();
+    };
+
+    // Fungsi untuk menambahkan review baru
+    const handleAddReview = () => {
+        if (newReviewText.trim() === '') {
+            alert('Review tidak boleh kosong!');
+            return;
+        }
+
+        const newReview = {
+            // Gunakan AvatarUser yang sudah diimpor dari podcastsData.js
+            avatarSrc: AvatarMichelle, // Pastikan AvatarUser diimport dan ada di podcastsData.js
+            name: 'Michelle', // Nama default untuk pengguna yang menambahkan review
+            handle: '@cellow', // Handle default
+            reviewText: newReviewText.trim(),
+        };
+
+        // Perbarui state reviews dengan review baru di paling atas
+        setReviews([newReview, ...reviews]);
+        // Kosongkan input setelah review ditambahkan
+        setNewReviewText('');
     };
 
     useEffect(() => {
-        if (location.hash) { 
-            const element = document.getElementById(location.hash.substring(1)); 
+        if (location.hash) {
+            const element = document.getElementById(location.hash.substring(1));
             if (element) {
-                element.scrollIntoView({ behavior: 'smooth' }); 
-                element.focus(); 
+                element.scrollIntoView({ behavior: 'smooth' });
+                element.focus();
             }
         }
     }, [location]);
@@ -156,18 +200,21 @@ export const Detail = () => {
                             {selectedPodcast.description}
                         </p>
                         <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-6">
-                            <div className="bg-transparent border-2 border-[#3c6255] rounded-md px-6 py-2 text-[#3c6255] flex items-center justify-center hover:bg-[#d0c69d] transition-colors duration-300 text-base"
-                            onClick={() => { 
-                                const targetInput = document.getElementById('add-review-input');
-                                if (targetInput) {
-                                  targetInput.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
-                                  targetInput.focus(); 
-                                }
-                              }}
-                            
+                          
+
+                            {/* Tombol "Review" utama */}
+                            <button className="bg-transparent border-2 border-[#3c6255] rounded-md px-6 py-2 text-[#3c6255] flex items-center justify-center hover:bg-[#d0c69d] transition-colors duration-300 text-base"
+                                onClick={() => {
+                                    const targetInput = document.getElementById('add-review-input');
+                                    if (targetInput) {
+                                        targetInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                        targetInput.focus();
+                                    }
+                                }}
                             >
                                 <i className="ri-edit-2-line mr-2"></i> Review
-                            </div>
+                            </button>
+                            {/* Tombol "Playlist" utama */}
                             <button
                                 className="bg-transparent border-2 border-[#3c6255] rounded-md px-6 py-2 text-[#3c6255] flex items-center justify-center hover:bg-[#d0c69d] transition-colors duration-300 text-base"
                                 onClick={() => handleOpenAddPlaylistPopup(selectedPodcast.id)}
@@ -198,6 +245,54 @@ export const Detail = () => {
 
                 <div className="w-full border-b-2 border-[#3C6255] my-12"></div>
 
+                {/* Bagian Input Review yang Diperbarui */}
+                <section id="review-section" className="mb-12">
+                    <div className="w-full p-6 bg-[#a6bb8d]/50 rounded-md overflow-hidden mb-6 flex items-center">
+                        <div className="w-[70px] h-[70px] rounded-full overflow-hidden mr-4">
+                            {/* Menggunakan AvatarUser yang diimport dari podcastsData.js */}
+                            <img src={AvatarMichelle} alt="User Avatar" className="w-full h-full object-cover"/>
+                        </div>
+                        <input
+                            id="add-review-input"
+                            className="flex-grow text-base text-left text-[#3c6255]/90 p-2 rounded-md bg-transparent border-none focus:outline-none"
+                            placeholder='Add a review...'
+                            value={newReviewText} // Binding nilai input ke state
+                            onChange={(e) => setNewReviewText(e.target.value)} // Mengupdate state saat input berubah
+                            onKeyPress={(e) => { // Menambahkan review saat Enter ditekan
+                                if (e.key === 'Enter') {
+                                    handleAddReview();
+                                }
+                            }}
+                        />
+                        {/* Tombol untuk Submit Review */}
+                        <button
+                            onClick={handleAddReview}
+                            className="ml-4 px-4 py-2 bg-[#3c6255] rounded-md text-[#eae7b1] hover:bg-[#2c4f43] transition-colors"
+                        >
+                            Submit
+                        </button>
+                    </div>
+
+                    <div className="flex flex-col">
+                        {reviews.length > 0 ? (
+                            reviews.map((review, index) => (
+                                <ReviewCard
+                                    key={index}
+                                    avatarSrc={review.avatarSrc}
+                                    name={review.name}
+                                    handle={review.handle}
+                                    reviewText={review.reviewText}
+                                />
+                            ))
+                        ) : (
+                            <p className="text-base text-left text-[#3c6255]">Belum ada review untuk podcast ini.</p>
+                        )}
+                    </div>
+                </section>
+
+
+                <div className="w-full border-b-2 border-[#3C6255] my-12"></div>
+
                 <section className="mb-12">
                     <div className="flex justify-between items-end mb-6">
                         <h2 className="text-2xl font-semibold text-left text-[#3c6255]">
@@ -220,7 +315,7 @@ export const Detail = () => {
                                     channel={related.channel}
                                     coverSrc={related.coverSrc}
                                     rating={related.rating}
-                                    onAddToPlaylistClick={handleOpenAddPlaylistPopup} 
+                                    onAddToPlaylistClick={handleOpenAddPlaylistPopup}
                                 />
                             ))
                         ) : (
@@ -228,37 +323,6 @@ export const Detail = () => {
                         )}
                     </div>
                 </section>
-
-                <div className="w-full border-b-2 border-[#3C6255] my-12"></div>
-                <section id="review-section" className="mb-12">
-                    <div className="w-full p-6 bg-[#a6bb8d]/50 rounded-md overflow-hidden mb-6 flex items-center">
-                        <div className="w-[70px] h-[70px] rounded-full overflow-hidden mr-4">
-                            <img src={AvatarMichelle} alt="User Avatar" className="w-full h-full object-cover"/>
-                        </div>
-                        <input
-                            id="add-review-input"
-                            className="flex-grow text-base text-left text-[#3c6255]/90 p-2 rounded-md bg-transparent border-none focus:outline-none"
-                            placeholder='Add a review...'
-                        />
-                    </div>
-
-                    <div className="flex flex-col">
-                        {selectedPodcast.reviews.length > 0 ? (
-                            selectedPodcast.reviews.map((review, index) => (
-                                <ReviewCard
-                                    key={index}
-                                    avatarSrc={review.avatarSrc}
-                                    name={review.name}
-                                    handle={review.handle}
-                                    reviewText={review.reviewText}
-                                />
-                            ))
-                        ) : (
-                            <p className="text-base text-left text-[#3c6255]">Belum ada review untuk podcast ini.</p>
-                        )}
-                    </div>
-                </section>
-               
 
                 <div className="w-full border-b-2 border-[#3C6255] my-12"></div>
 
@@ -312,8 +376,8 @@ export const Detail = () => {
             <AddPlaylist
                 isOpen={isAddPlaylistPopupOpen}
                 onClose={handleCloseAddPlaylistPopup}
-                playlists={playlistsData} 
-                onAddToPlaylist={handleAddToPlaylist} 
+                playlists={playlistsData}
+                onAddToPlaylist={handleAddToPlaylist}
             />
         </div>
     );
