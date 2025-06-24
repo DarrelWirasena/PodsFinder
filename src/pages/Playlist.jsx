@@ -5,7 +5,7 @@ import { PlaceholderImage } from '../data/podcastsData';
 
 const PlaylistSectionHeader = ({ title, linkTo = '#' }) => (
     <div className="flex ml-8 justify-between items-center mb-4">
-        <h2 className="text-2xl md:text-3xl font-medium text-left text-[#3c6255]">{title}</h2>
+        <h2 className="text-2xl md:text-3xl font-medium text-left text-[#3c6255] ">{title}</h2>
         <Link to={linkTo} className="flex items-center text-base text-[#3c6255] hover:underline">
             View all
             <i className="ri-arrow-right-double-line w-5 h-5 ml-1 flex items-center mr-8 justify-center"></i>
@@ -14,44 +14,44 @@ const PlaylistSectionHeader = ({ title, linkTo = '#' }) => (
 );
 
 const EpisodeItemCard = ({ image, channel, title, rating, onTriggerConfirm, episodeId, podcastId, channelId }) => (
-        <div className="relative flex flex-col ml-8 mr-8 sm:flex-row items-start sm:items-center gap-4 p-4 bg-[#eae7b1] rounded-lg shadow-md">
-            <img src={image || PlaceholderImage} alt="Episode Cover" className="w-28 h-28 rounded object-cover flex-shrink-0" />
-            <div className="flex-grow">
+    <div className="relative flex flex-col ml-8 mr-8 sm:flex-row items-start sm:items-center gap-4 p-4 bg-[#eae7b1] rounded-lg shadow-md overflow-hidden">
+        <img src={image || PlaceholderImage} alt="Episode Cover" className="w-28 h-28 rounded object-cover flex-shrink-0" />
+        
+        <div className="flex-grow min-w-0 flex-basis-0 overflow-hidden max-w-full"> 
             <Link to={`/detail/${podcastId}`} className="block">
-                <p className="text-base text-[#3c6255] mb-1">{channel}</p>
-                <h3 className="text-lg font-semibold text-[#3c6255] mb-2">{title}</h3>
+                <p className="text-base text-[#3c6255] mb-1 truncate whitespace-nowrap overflow-hidden w-full">{channel}</p>
+                <h3 className="text-lg font-semibold text-[#3c6255] mb-2 truncate whitespace-nowrap overflow-hidden w-full">{title}</h3>
                 <div className="flex items-center text-[#3c6255]">
                     <p className="text-base leading-none">{rating}</p>
                     <i className="ri-star-s-fill text-base leading-none ml-1"></i>
                 </div>
+            </Link>
+            {channelId && channel && ( 
+                <Link
+                    to={`/detailchannel/${channelId}`} 
+                    className="text-sm text-[#3c6255] mt-2 hover:underline hover:text-[#2c4f43] transition-colors block truncate whitespace-nowrap overflow-hidden w-full"
+                    onClick={(e) => e.stopPropagation()} 
+                >
+                    Channel: {channel} <i className="ri-share-box-line ml-1"></i>
                 </Link>
-                {channelId && channel && ( 
-                    <Link
-                        to={`/detailchannel/${channelId}`} 
-                        className="text-sm text-[#3c6255] mt-2 hover:underline hover:text-[#2c4f43] transition-colors"
-                        onClick={(e) => e.stopPropagation()} 
-                    >
-                        Channel: {channel} <i className="ri-share-box-line ml-1"></i>
-                    </Link>
-                )}
-            </div>
-
-            <button
-                className="
-                    absolute top-0 right-0 p-2 z-10
-                    text-2xl text-[#3c6255]
-                    cursor-pointer transition-colors duration-200 hover:text-red-500
-                    md:static md:ml-auto md:p-0 md:text-xl
-                    ri-delete-bin-fill"
-                onClick={(e) => {
-                    e.preventDefault(); 
-                    e.stopPropagation(); 
-                    onTriggerConfirm(episodeId);
-                }}
-            >
-            </button>
+            )}
         </div>
-   
+
+        <button
+            className="
+                absolute top-2 right-2 p-1 z-10 
+                text-xl text-[#3c6255] 
+                cursor-pointer transition-colors duration-200 hover:text-red-500
+                md:static md:ml-auto md:p-0 md:text-xl
+                ri-delete-bin-fill"
+            onClick={(e) => {
+                e.preventDefault(); 
+                e.stopPropagation(); 
+                onTriggerConfirm(episodeId);
+            }}
+        >
+        </button>
+    </div>
 );
 
 export const Playlist = ({ onTriggerConfirm }) => {

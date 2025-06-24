@@ -14,7 +14,7 @@ const PodcastCard = ({ id, image, title, channel, episode, rating, onAddToPlayli
           className="w-24 h-24 rounded-lg object-cover flex-shrink-0"
         />
         <div className="flex-grow">
-          <h3 className="text-lg font-semibold text-[#3c6255] mb-1 leading-tight">{title}</h3>
+          <h3 className="text-lg font-semibold text-[#3c6255] mb-1 leading-tight truncate whitespace-nowrap overflow-hidden">{title}</h3>
           <p className="text-sm text-[#3c6255] mb-1 leading-snug">{channel} - {episode}</p>
           <div className="flex items-center text-[#3c6255] text-sm">
             <i className="ri-star-s-fill mr-1"></i>

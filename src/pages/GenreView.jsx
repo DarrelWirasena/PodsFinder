@@ -1,14 +1,50 @@
-import React from 'react';
+import React, { useState } from 'react'; 
 import { useParams, Link } from 'react-router-dom';
 import { allPodcastsData, allGenresData, PlaceholderImage } from '../data/podcastsData';
+import { AddPlaylist } from '../components/AddPlaylist'; 
+import { playlistsData } from '../data/playlistsData'; 
 
 export const GenreView = () => {
   const { genreName } = useParams();
-  console.log("1. genreName from URL:", genreName);
+  const [isAddPlaylistPopupOpen, setIsAddPlaylistPopupOpen] = useState(false);
+  const [podcastToAddId, setPodcastToAddId] = useState(null); 
+
+  const handleOpenAddPlaylistPopup = (id) => {
+    setPodcastToAddId(id);
+    setIsAddPlaylistPopupOpen(true);
+  };
+
+  const handleCloseAddPlaylistPopup = () => {
+    setIsAddPlaylistPopupOpen(false);
+    setPodcastToAddId(null);
+  };
+
+  const handleAddToPlaylist = (playlistId) => {
+    const podcastToAddToPlaylist = allPodcastsData.find(p => p.id === podcastToAddId);
+    if (podcastToAddToPlaylist) {
+      const targetPlaylist = playlistsData.find(p => p.id === playlistId);
+      if (targetPlaylist) {
+        const episodeExists = targetPlaylist.episodes.some(ep => ep.id === podcastToAddToPlaylist.id);
+        if (!episodeExists) {
+          targetPlaylist.episodes.push({
+            id: podcastToAddToPlaylist.id,
+            image: podcastToAddToPlaylist.coverImage || PlaceholderImage, 
+            podcastTitle: podcastToAddToPlaylist.channel, 
+            episodeTitle: podcastToAddToPlaylist.title, 
+            rating: podcastToAddToPlaylist.rating
+          });
+          console.log(`Podcast "${podcastToAddToPlaylist.title}" berhasil ditambahkan ke "${targetPlaylist.title}"`);
+        } else {
+          console.log(`Podcast "${podcastToAddToPlaylist.title}" sudah ada di "${targetPlaylist.title}"`);
+        }
+      }
+    }
+    handleCloseAddPlaylistPopup(); 
+  };
+
   const selectedGenre = allGenresData.find(
     (genre) => genre.name.toLowerCase() === genreName.toLowerCase()
   );
-  console.log("2. selectedGenre object:", selectedGenre);
 
   if (!selectedGenre) {
     return (
@@ -28,48 +64,64 @@ export const GenreView = () => {
         <h1 className="text-[#3c6255] md:ml-10 pt-4 font-bold text-3xl">
           {selectedGenre.name} Podcasts
         </h1>
-        <hr className="border-t border-[#3c6255] w-auto my-6 ml-10 md:mr-10" />
+        <hr className="border-t-2 border-[#3c6255] mt-6 my-6" />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
           {genrePodcasts.length > 0 ? (
             genrePodcasts.map((podcast) => (
-              <div key={podcast.id} className="bg-[#eae7b1] gap-4 p-4 rounded-lg shadow-md ml-8 mr-8">
-                <div className="flex items-start gap-4 mb-4">
-                  <Link to={`/detail/${podcast.id}`}> 
-                    <img
-                      src={podcast.coverImage || PlaceholderImage} 
-                      alt={podcast.title}
-                      className="w-28 h-28 object-cover rounded-md flex-shrink-0"
-                    />
-                  </Link>
+              <div key={podcast.id} className="block p-4 bg-[#eae7b1] rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 mx-auto w-full max-w-lg sm:max-w-none">
+  <Link to={`/detail/${podcast.id}`} className="block">
+    <div className="flex items-start gap-4">
+      <img
+        src={podcast.coverImage || PlaceholderImage} 
+        alt={podcast.title}
+        className="w-24 h-24 rounded-lg object-cover flex-shrink-0" 
+      />
+      <div className="flex-grow">
+        <h3 className="text-lg font-semibold text-[#3c6255] mb-1 leading-tight">{podcast.title}</h3>
+        <p className="text-sm text-[#3c6255] mb-1 leading-snug">
+          {podcast.channel} - {podcast.episodes && podcast.episodes[0] ? podcast.episodes[0].title : 'No Episode Title'}
+        </p>
+        <div className="flex items-center text-[#3c6255] text-sm">
+          <i className="ri-star-s-fill mr-1"></i>
+          <p>{podcast.rating}</p>
+        </div>
+      </div>
+    </div>
+  </Link>
 
-                  <div className="flex flex-col justify-center flex-grow">
-                    <Link to={`/detail/${podcast.id}`} className="hover:underline">
-                      <h2 className="text-xl font-semibold text-[#3c6255] leading-tight">{podcast.title}</h2>
-                    </Link>
-                    <p className="text-base text-[#3c6255] mt-1">{podcast.episodes[0]?.title || 'No episode info'}</p>
-                    <div className="flex items-center text-[#3c6255] mt-2">
-                      <i className="ri-star-s-fill mr-1"></i>
-                      <p>{podcast.rating}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex gap-2 mt-4">
-                  <button className="bg-[#3c6255] text-[#eae7b1] px-3 py-1.5 rounded-md text-sm hover:opacity-90 flex items-center">
-                    <i className="ri-edit-2-line mr-1"></i> Review
-                  </button>
-                  <button className="bg-[#3c6255] text-[#eae7b1] px-3 py-1.5 rounded-md text-sm hover:opacity-90 flex items-center">
-                    <i className="ri-heart-3-fill mr-1"></i> Playlist
-                  </button>
-                </div>
-              </div>
+  <div className="flex gap-3 mt-4 "> 
+    <Link 
+      to={`/detail/${podcast.id}#review-section`} 
+      className='flex-1 min-w-0' 
+    >
+      <button
+        className="w-full bg-[#3c6255] rounded-md h-8 text-[#EAE7B1] flex justify-center items-center hover:bg-[#2c4f43] transition-colors duration-300 text-sm px-2"
+      >
+        <i className="ri-edit-2-line mr-1"></i> Review
+      </button>
+    </Link>
+    <button
+      className="flex-1 bg-[#3c6255] rounded-md h-8 text-[#EAE7B1] flex justify-center items-center hover:bg-[#2c4f43] transition-colors duration-300 text-sm px-2"
+      onClick={() => handleOpenAddPlaylistPopup(podcast.id)} 
+    >
+      <i className="ri-heart-3-fill mr-1"></i>Playlist
+    </button>
+  </div>
+</div>
             ))
           ) : (
             <p className="text-base text-left text-[#3c6255]">No podcasts found for this genre.</p>
           )}
         </div>
       </div>
+
+      <AddPlaylist
+        isOpen={isAddPlaylistPopupOpen}
+        onClose={handleCloseAddPlaylistPopup}
+        playlists={playlistsData} 
+        onAddToPlaylist={handleAddToPlaylist} 
+      />
     </div>
   );
 };

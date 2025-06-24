@@ -1,16 +1,16 @@
 import BerizikCover from '../assets/images/Berizik.png';
 import Bapak2BangetCover from '../assets/images/bapak@banget.png';
 import OlahragaCover from '../assets/images/podcast olahraga.png';
-import NightRide from '../assets/images/nightRide.png'; 
+import NightRide from '../assets/images/nightRide.png';
 import TanahJawa from '../assets/images/tanahJawa.png'
 import PlaceholderImage from '../assets/images/Berizik.png';
-import AvatarMichelle from '../assets/images/michelle.jpg';
+import AvatarMichelle from '../assets/images/michelle.jpg'; // Avatar untuk Michelle
 
 export {
     BerizikCover,
     Bapak2BangetCover,
     OlahragaCover,
-    NightRide, 
+    NightRide,
     TanahJawa,
     PlaceholderImage,
     AvatarMichelle,
@@ -27,18 +27,39 @@ export const allPodcastsData = [
         rating: '4.5',
         description: 'Ini adalah episode terakhir dari playlist Berizik, membahas momen-momen paling berkesan dan rencana ke depan. Jangan lewatkan obrolan santai yang penuh tawa dan refleksi.',
         episodes: [
-            { title: 'EP29: Last Playlist Berizik', date: '18 DECEMBER 2024', description: 'Episode perpisahan playlist Berizik, penuh nostalgia dan janji untuk kembali.' },
-            { title: 'EP28: Obrolan Tengah Malam', date: '11 DECEMBER 2024', description: 'Diskusi seru tentang tren terkini dan fenomena sosial yang sedang viral.' },
-            { title: 'EP27: Ngopi Bareng Seleb', date: '04 DECEMBER 2024', description: 'Wawancara eksklusif dengan selebriti papan atas, membahas karir dan kehidupan pribadi.' },
+            { id: 'berizik-ep29-ep1', title: 'EP29: Last Playlist Berizik', date: '18 DECEMBER 2024', description: 'Episode perpisahan playlist Berizik, penuh nostalgia dan janji untuk kembali.' },
+            { id: 'berizik-ep29-ep2', title: 'EP28: Obrolan Tengah Malam', date: '11 DECEMBER 2024', description: 'Diskusi seru tentang tren terkini dan fenomena sosial yang sedang viral.' },
+            { id: 'berizik-ep29-ep3', title: 'EP27: Ngopi Bareng Seleb', date: '04 DECEMBER 2024', description: 'Wawancara eksklusif dengan selebriti papan atas, membahas karir dan kehidupan pribadi.' },
         ],
         reviews: [
-            { avatarSrc: AvatarMichelle, name: 'Frans', handle: '@00franss', reviewText: "Podcast ini selalu berhasil bikin ngakak! Episode terakhirnya bikin baper tapi tetap menghibur. Recommended banget!" },
-            { avatarSrc: AvatarMichelle, name: 'Michelle', handle: '@celow', reviewText: "Kocak banget! Setiap episode selalu ada kejutan dan insight baru. Suka banget sama hostnya." },
-            { avatarSrc: AvatarMichelle, name: 'Bram', handle: '@braawm', reviewText: "Wajib dengerin! Kontennya segar, pengisi suaranya asik, dan bikin mood jadi naik terus." },
+            {
+                id: 'review-berizik-frans', // ID unik untuk review ini
+                avatarSrc: AvatarMichelle, // Avatar default untuk Frans
+                name: 'Frans',
+                handle: '@00franss',
+                reviewText: "Podcast ini selalu berhasil bikin ngakak! Episode terakhirnya bikin baper tapi tetap menghibur. Recommended banget!",
+                userId: 'user-frans', // Tambahkan userId untuk Frans
+            },
+            {
+                id: 'review-berizik-michelle', // ID unik untuk review ini
+                avatarSrc: AvatarMichelle, // Avatar Michelle
+                name: 'Michelle',
+                handle: '@celow',
+                reviewText: "Kocak banget! Setiap episode selalu ada kejutan dan insight baru. Suka banget sama hostnya.",
+                userId: 'user-michellee', // Tambahkan userId untuk Michelle
+            },
+            {
+                id: 'review-berizik-bram', // ID unik untuk review ini
+                avatarSrc: AvatarMichelle, // Avatar default untuk Bram
+                name: 'Bram',
+                handle: '@braawm',
+                reviewText: "Wajib dengerin! Kontennya segar, pengisi suaranya asik, dan bikin mood jadi naik terus.",
+                userId: 'user-bram', // Tambahkan userId untuk Bram
+            },
         ],
         relatedPodcasts: [
             { id: 'bapak2banget-ep1', title: 'Bapak2banget Podcast', channel: 'BAPAK2BANGET', coverSrc: Bapak2BangetCover, rating: '4.6' },
-            { id: 'motivation-1', title: 'Inovasi Muda', channel: 'INOVATOR', coverSrc: Bapak2BangetCover, rating: '4.7' },
+            { id: 'motivation-1', title: 'Inovasi Muda', channel: 'INOVATOR', coverSrc: PlaceholderImage, rating: '4.7' },
         ],
         info: {
             channelName: 'BERIZIK Official',
@@ -46,7 +67,7 @@ export const allPodcastsData = [
             showWeb: 'www.berizik.com',
             yearsActive: '2023-2025',
             totalEpisodes: '150',
-            genre: 'Komedi', 
+            genre: 'Komedi',
             copyright: '© 2025 Berizik Studios',
             license: 'All Rights Reserved'
         }
@@ -60,10 +81,17 @@ export const allPodcastsData = [
         rating: '4.5',
         description: 'Dengarkan cerita-cerita horor dari bapak-bapak yang akan membuat Anda merinding sekaligus tertawa. Episode pertama ini menceritakan tentang kampung sebelah yang penuh misteri.',
         episodes: [
-            { title: 'E01: Kisah Horor Kampung Sebelah', date: '01 JANUARI 2025', description: 'Pertama kali membahas cerita horor yang terjadi di sekitar kita.' },
+            { id: 'bapak2banget-ep1-ep1', title: 'E01: Kisah Horor Kampung Sebelah', date: '01 JANUARI 2025', description: 'Pertama kali membahas cerita horor yang terjadi di sekitar kita.' },
         ],
         reviews: [
-            { avatarSrc: AvatarMichelle, name: 'Michelle', handle: '@celow', reviewText: "Serem tapi kocak! Bapak-bapak emang paling bisa bikin suasana tegang tapi lucu." },
+            {
+                id: 'review-bapak2banget-michelle', // ID unik
+                avatarSrc: AvatarMichelle, // Avatar Michelle
+                name: 'Michelle',
+                handle: '@celow',
+                reviewText: "Serem tapi kocak! Bapak-bapak emang paling bisa bikin suasana tegang tapi lucu.",
+                userId: 'user-michelle', // Tambahkan userId untuk Michelle
+            },
         ],
         relatedPodcasts: [
             { id: 'berizik-ep29', title: 'Last Playlist Berizik', channel: 'BERIZIK', coverSrc: BerizikCover, rating: '4.5' },
@@ -80,7 +108,7 @@ export const allPodcastsData = [
         }
     },
     {
-        id: 'bapak2banget-ep2', 
+        id: 'bapak2banget-ep2',
         image: Bapak2BangetCover,
         channel: 'BAPAK2BANGET',
         channelId: 'bapak2banget-channel',
@@ -88,9 +116,9 @@ export const allPodcastsData = [
         rating: '4.2',
         description: 'Melanjutkan petualangan horor, kali ini membahas rumah tua angker di pinggir kota. Bersiaplah untuk cerita yang lebih menyeramkan!',
         episodes: [
-            { title: 'E02: Misteri Rumah Tua', date: '08 JANUARI 2025', description: 'Kisah-kisah menyeramkan dari rumah tua yang ditinggalkan.' },
+            { id: 'bapak2banget-ep2-ep1', title: 'E02: Misteri Rumah Tua', date: '08 JANUARI 2025', description: 'Kisah-kisah menyeramkan dari rumah tua yang ditinggalkan.' },
         ],
-        reviews: [],
+        reviews: [], // Not adding reviews here, so no userId needed for this part
         relatedPodcasts: [],
         info: {
             channelName: 'BAPAK2BANGET Official',
@@ -98,20 +126,22 @@ export const allPodcastsData = [
             showWeb: 'www.bapak2banget.com',
             yearsActive: '2024-Sekarang',
             totalEpisodes: '20',
-            genre: 'Horor', 
+            genre: 'Horor',
             copyright: '© 2025 Bapak2banget',
             license: 'Semua Hak Dilindungi'
         }
     },
     {
-        id: 'malam-jumat-ep1', 
+        id: 'malam-jumat-ep1',
         image: NightRide,
         channel: 'MALAM JUMAT',
         channelId: 'malam-jumat-channel',
         title: 'Kisah Hantu Kosan',
         rating: '4.7',
         description: 'Cerita seram dari pengalaman nyata penghuni kosan.',
-        episodes: [],
+        episodes: [
+            { id: 'malam-jumat-ep1-ep1', title: 'Kisah Hantu Kosan', date: '10 FEBRUARI 2025', description: 'Kisah seram yang dialami di kosan.' },
+        ],
         reviews: [],
         relatedPodcasts: [],
         info: {
@@ -120,20 +150,22 @@ export const allPodcastsData = [
             showWeb: 'www.malamjumat.com',
             yearsActive: '2024-Sekarang',
             totalEpisodes: '10',
-            genre: 'Horor', 
+            genre: 'Horor',
             copyright: '© 2025 Malam Jumat',
             license: 'All Rights Reserved'
         }
     },
     {
-        id: 'kisah-tanah-jawa-ep1', 
+        id: 'kisah-tanah-jawa-ep1',
         image: NightRide,
         channel: 'KISAH TANAH JAWA',
         channelId: 'kisah-tanah-jawa-channel',
         title: 'Misteri Gunung Merapi',
         rating: '4.9',
         description: 'Mengungkap misteri di balik gunung paling angker di Jawa.',
-        episodes: [],
+        episodes: [
+            { id: 'kisah-tanah-jawa-ep1-ep1', title: 'Misteri Gunung Merapi', date: '15 MARET 2025', description: 'Ekspedisi ke gunung misterius.' },
+        ],
         reviews: [],
         relatedPodcasts: [],
         info: {
@@ -142,7 +174,7 @@ export const allPodcastsData = [
             showWeb: 'www.kisahtanahjawa.com',
             yearsActive: '2024-Sekarang',
             totalEpisodes: '15',
-            genre: 'Horor', 
+            genre: 'Horor',
             copyright: '© 2025 Kisah Tanah Jawa',
             license: 'All Rights Reserved'
         }
@@ -155,7 +187,7 @@ export const allPodcastsData = [
         title: 'Episode 1: Drama Kehidupan',
         rating: '4.3',
         description: 'Menganalisis berbagai drama kehidupan sosial yang sering terjadi di masyarakat.',
-        episodes: [{ title: 'Episode 1: Drama Kehidupan', date: '01 MARET 2024', description: 'Pengenalan tentang drama sosial.' }],
+        episodes: [{ id: 'social-drama-1-ep1', title: 'Episode 1: Drama Kehidupan', date: '01 MARET 2024', description: 'Pengenalan tentang drama sosial.' }],
         reviews: [],
         relatedPodcasts: [],
         info: {
@@ -177,7 +209,7 @@ export const allPodcastsData = [
         title: 'Episode 2: Realita Kota',
         rating: '4.1',
         description: 'Membahas realita dan tantangan hidup di kota metropolitan.',
-        episodes: [{ title: 'Episode 2: Realita Kota', date: '08 MARET 2024', description: 'Dinamika kehidupan perkotaan.' }],
+        episodes: [{ id: 'social-drama-2-ep1', title: 'Episode 2: Realita Kota', date: '08 MARET 2024', description: 'Dinamika kehidupan perkotaan.' }],
         reviews: [],
         relatedPodcasts: [],
         info: {
@@ -199,7 +231,7 @@ export const allPodcastsData = [
         title: 'Kiat Sukses Startup',
         rating: '4.7',
         description: 'Tips dan trik untuk membangun startup sukses dari nol.',
-        episodes: [{ title: 'Kiat Sukses Startup', date: '01 APRIL 2024', description: 'Rahasia startup yang berhasil.' }],
+        episodes: [{ id: 'motivation-1-ep1', title: 'Kiat Sukses Startup', date: '01 APRIL 2024', description: 'Rahasia startup yang berhasil.' }],
         reviews: [],
         relatedPodcasts: [],
         info: {
@@ -221,7 +253,7 @@ export const allPodcastsData = [
         title: 'Bangkit dari Kegagalan',
         rating: '4.6',
         description: 'Cerita inspiratif dan motivasi untuk bangkit setelah mengalami kegagalan.',
-        episodes: [{ title: 'Bangkit dari Kegagalan', date: '08 APRIL 2024', description: 'Mempelajari dari kesalahan.' }],
+        episodes: [{ id: 'motivation-2-ep1', title: 'Bangkit dari Kegagalan', date: '08 APRIL 2024', description: 'Mempelajari dari kesalahan.' }],
         reviews: [],
         relatedPodcasts: [],
         info: {
@@ -243,7 +275,7 @@ export const allPodcastsData = [
         title: 'Tradisi Nusantara',
         rating: '4.4',
         description: 'Mengupas tuntas keunikan tradisi dan budaya dari berbagai daerah di Nusantara.',
-        episodes: [{ title: 'Tradisi Nusantara', date: '01 MEI 2024', description: 'Kekayaan budaya Indonesia.' }],
+        episodes: [{ id: 'culture-1-ep1', title: 'Tradisi Nusantara', date: '01 MEI 2024', description: 'Kekayaan budaya Indonesia.' }],
         reviews: [],
         relatedPodcasts: [],
         info: {
@@ -265,7 +297,7 @@ export const allPodcastsData = [
         title: 'Fenomena Masyarakat',
         rating: '4.0',
         description: 'Menganalisis fenomena-fenomena sosial yang menarik perhatian masyarakat.',
-        episodes: [{ title: 'Fenomena Masyarakat', date: '08 MEI 2024', description: 'Tren sosial terkini.' }],
+        episodes: [{ id: 'culture-2-ep1', title: 'Fenomena Masyarakat', date: '08 MEI 2024', description: 'Tren sosial terkini.' }],
         reviews: [],
         relatedPodcasts: [],
         info: {
@@ -287,7 +319,7 @@ export const allPodcastsData = [
         title: 'Analisis Pertandingan',
         rating: '4.8',
         description: 'Analisis mendalam setiap pertandingan olahraga, dari sepak bola hingga bulu tangkis.',
-        episodes: [{ title: 'Analisis Pertandingan', date: '01 JUNI 2024', description: 'Ulasan pertandingan penting.' }],
+        episodes: [{ id: 'sport-1-ep1', title: 'Analisis Pertandingan', date: '01 JUNI 2024', description: 'Ulasan pertandingan penting.' }],
         reviews: [],
         relatedPodcasts: [],
         info: {
@@ -309,7 +341,7 @@ export const allPodcastsData = [
         title: 'Perjalanan Juara',
         rating: '4.9',
         description: 'Membahas kisah-kisah inspiratif dari para juara dan atlet berprestasi.',
-        episodes: [{ title: 'Perjalanan Juara', date: '08 JUNI 2024', description: 'Kisah sukses atlet.' }],
+        episodes: [{ id: 'sport-2-ep1', title: 'Perjalanan Juara', date: '08 JUNI 2024', description: 'Kisah sukses atlet.' }],
         reviews: [],
         relatedPodcasts: [],
         info: {
@@ -329,7 +361,7 @@ export const allChannelsData = [
     {
         id: 'berizik-channel',
         name: 'BERIZIK Official',
-        image: BerizikCover, 
+        image: BerizikCover,
         description: 'Channel resmi BERIZIK, menyajikan konten komedi, obrolan santai, dan wawancara inspiratif.',
         creator: 'Awwe, Noice Studios, Randhika Djamil',
         genre: 'Komedi',
@@ -338,12 +370,12 @@ export const allChannelsData = [
             instagram: 'https://instagram.com/berizik',
             youtube: 'https://www.youtube.com/channel/UC-your-channel-id',
         },
-        podcastIds: ['berizik-ep29'], 
+        podcastIds: ['berizik-ep29'],
     },
     {
         id: 'bapak2banget-channel',
         name: 'BAPAK2BANGET Official',
-        image: Bapak2BangetCover, 
+        image: Bapak2BangetCover,
         description: 'Dengarkan kisah horor dan komedi dari sudut pandang bapak-bapak!',
         creator: 'Tim Bapak2banget',
         genre: 'Horor, Komedi',
@@ -357,7 +389,7 @@ export const allChannelsData = [
     {
         id: 'malam-jumat-channel',
         name: 'MALAM JUMAT',
-        image: NightRide, 
+        image: NightRide,
         description: 'Kumpulan kisah seram dan misteri yang akan membuat bulu kuduk berdiri.',
         creator: 'Tim Malam Jumat',
         genre: 'Horor',
@@ -370,7 +402,7 @@ export const allChannelsData = [
     {
         id: 'kisah-tanah-jawa-channel',
         name: 'KISAH TANAH JAWA',
-        image: NightRide, 
+        image: NightRide,
         description: 'Membongkar mitos dan cerita mistis dari tanah Jawa.',
         creator: 'Tim Kisah Tanah Jawa',
         genre: 'Horor',
@@ -449,7 +481,7 @@ export const allChannelsData = [
         id: 'jelajah-sosial-channel',
         name: 'JELAJAH SOSIAL',
         image: PlaceholderImage,
-        description: 'Analisis mendalam fenomena-fenomena sosial di masyarakat.',
+        description: 'Analisis mendalam fenomena-fenomena sosial yang menarik perhatian masyarakat.',
         creator: 'Tim Jelajah',
         genre: 'Social & Culture',
         subscribers: '160K',
@@ -484,7 +516,7 @@ export const allChannelsData = [
         },
         podcastIds: ['sport-2'],
     },
-    
+
 ];
 
 export const allGenresData = [

@@ -1,10 +1,7 @@
-// src/pages/Detail.jsx
-
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { playlistsData } from '../data/playlistsData';
-// Pastikan AvatarUser juga diimpor jika ingin menggunakan avatar berbeda untuk reviewer yang baru
-import { allPodcastsData, AvatarMichelle, PlaceholderImage } from '../data/podcastsData'; // <-- Tambahkan AvatarUser
+import { allPodcastsData, AvatarMichelle, PlaceholderImage } from '../data/podcastsData';
 import { AddPlaylist } from '../components/AddPlaylist';
 
 const EpisodeCard = ({ title, date, description }) => (
@@ -21,20 +18,128 @@ const EpisodeCard = ({ title, date, description }) => (
     </div>
 );
 
-const ReviewCard = ({ avatarSrc, name, handle, reviewText }) => (
-    <div className="w-full p-6 bg-[#a6bb8d]/80 rounded-md overflow-hidden mb-6 flex flex-col">
-        <div className="flex items-center mb-4">
-            <div className="w-[50px] h-[50px] rounded-full overflow-hidden mr-4">
-                <img src={avatarSrc} alt={`${name} Avatar`} className="w-full h-full object-cover"/>
+const ReviewCard = ({ id, avatarSrc, name, handle, reviewText, rating, onDelete, onEdit, reviewUserId, currentUserId, isEditing, onSaveEdit, onCancelEdit }) => {
+    const [editedReviewText, setEditedReviewText] = useState(reviewText);
+    const [editedReviewRating, setEditedReviewRating] = useState(rating);
+
+    useEffect(() => {
+        setEditedReviewText(reviewText);
+        setEditedReviewRating(rating);
+    }, [reviewText, rating]);
+
+    const renderStars = (numRating) => {
+        const fullStars = Math.floor(numRating);
+        const hasHalfStar = numRating % 1 !== 0;
+        const stars = [];
+
+        for (let i = 0; i < fullStars; i++) {
+            stars.push(<i key={`full-${id}-${i}`} className="ri-star-s-fill text-yellow-500"></i>);
+        }
+        if (hasHalfStar) {
+            stars.push(<i key={`half-${id}`} className="ri-star-half-s-fill text-yellow-500"></i>);
+        }
+        const emptyStars = 5 - stars.length;
+        for (let i = 0; i < emptyStars; i++) {
+            stars.push(<i key={`empty-${id}-${i}`} className="ri-star-s-fill text-gray-400"></i>);
+        }
+        return stars;
+    };
+
+    return (
+        <div className="relative w-full p-6 bg-[#a6bb8d]/80 rounded-md overflow-hidden mb-6 flex flex-col">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <div className="flex items-center">
+                    <div className="w-[50px] h-[50px] rounded-full overflow-hidden mr-4">
+                        <img src={avatarSrc} alt={`${name} Avatar`} className="w-full h-full object-cover"/>
+                    </div>
+                    <div>
+                        <p className="text-lg font-semibold text-left text-[#3c6255]">{name}</p>
+                        <p className="text-base text-left text-[#3c6255]">{handle}</p>
+                    </div>
+                </div>
+
+                {isEditing ? ( 
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                        <div className="flex items-center text-[#3c6255]">
+                            <i className="ri-star-s-fill text-yellow-500 text-lg mr-1"></i>
+                            <select
+                                className="px-2 py-1 bg-[#3c6255] rounded-md text-[#eae7b1] cursor-pointer appearance-none pr-6 hover:bg-[#2c4f43] transition-colors text-base"
+                                value={editedReviewRating}
+                                onChange={(e) => setEditedReviewRating(e.target.value)}
+                            >
+                                <option value="5.0">5.0</option>
+                                <option value="4.5">4.5</option>
+                                <option value="4.0">4.0</option>
+                                <option value="3.5">3.5</option>
+                                <option value="3.0">3.0</option>
+                                <option value="2.5">2.5</option>
+                                <option value="2.0">2.0</option>
+                                <option value="1.5">1.5</option>
+                                <option value="1.0">1.0</option>
+                            </select>
+                        </div>
+                        <button
+                            onClick={() => onSaveEdit(id, editedReviewText, editedReviewRating)} // Kirim rating yang diedit
+                            className="text-xl text-[#3c6255] cursor-pointer hover:text-green-600 transition-colors"
+                            aria-label="Simpan perubahan review"
+                        >
+                            <i className="ri-save-line"></i>
+                        </button>
+                        <button
+                            onClick={() => onCancelEdit(id)}
+                            className="text-xl text-[#3c6255] cursor-pointer hover:text-gray-600 transition-colors"
+                            aria-label="Batalkan edit review"
+                        >
+                            <i className="ri-close-circle-line"></i>
+                        </button>
+                    </div>
+                ) : ( 
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                        {rating && ( 
+                            <div className="flex items-center text-[#3c6255] flex-shrink-0">
+                                <p className="text-lg font-bold mr-1">{parseFloat(rating).toFixed(1)}</p>
+                                <div className="hidden sm:flex text-lg">
+                                    {renderStars(parseFloat(rating))}
+                                </div>
+                            </div>
+                        )}
+                        {reviewUserId === currentUserId && ( 
+                            <>
+                                <button
+                                    onClick={() => onEdit(id, reviewText, rating)} 
+                                    className="text-xl text-[#3c6255] cursor-pointer hover:text-blue-500 transition-colors"
+                                    aria-label={`Edit review dari ${name}`}
+                                >
+                                    <i className="ri-edit-line"></i>
+                                </button>
+                                <button
+                                    onClick={() => onDelete(id)}
+                                    className="text-xl text-[#3c6255] cursor-pointer hover:text-red-500 transition-colors"
+                                    aria-label={`Hapus review dari ${name}`}
+                                >
+                                    <i className="ri-delete-bin-fill"></i>
+                                </button>
+                            </>
+                        )}
+                    </div>
+                )}
             </div>
-            <div>
-                <p className="text-lg font-semibold text-left text-[#3c6255]">{name}</p>
-                <p className="text-base text-left text-[#3c6255]">{handle}</p>
-            </div>
+
+            {isEditing ? (
+                <textarea
+                    className="w-full p-2 rounded-md bg-[#eae7b1] text-base text-[#3c6255] border border-[#3c6255] focus:outline-none focus:border-[#2c4f43] resize-y mb-2"
+                    value={editedReviewText}
+                    onChange={(e) => setEditedReviewText(e.target.value)}
+                    rows="3"
+                />
+            ) : (
+                <p className="text-base text-left text-[#3c6255] line-clamp-2 overflow-hidden break-words">
+                    {reviewText}
+                </p>
+            )}
         </div>
-        <p className="text-base text-left text-[#3c6255]">"{reviewText}"</p>
-    </div>
-);
+    );
+};
 
 const RelatedPodcastCard = ({ id, title, channel, coverSrc, rating, onAddToPlaylistClick }) => (
     <Link to={`/detail/${id}`} className="w-full bg-[#eae7b1] rounded-lg p-4 flex flex-col sm:flex-row items-start gap-4 shadow-md hover:shadow-lg transition-shadow duration-300">
@@ -64,7 +169,7 @@ const RelatedPodcastCard = ({ id, title, channel, coverSrc, rating, onAddToPlayl
                 <button
                     className="flex items-center px-3 py-1 bg-[#3c6255] rounded-md shadow-md text-[#eae7b1] text-sm"
                     onClick={(e) => {
-                        e.preventDefault(); // Mencegah navigasi Link
+                        e.preventDefault();
                         document.getElementById('add-review-input').focus();
                         document.getElementById('add-review-input').scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }}
@@ -77,25 +182,35 @@ const RelatedPodcastCard = ({ id, title, channel, coverSrc, rating, onAddToPlayl
     </Link>
 );
 
-
 export const Detail = () => {
     const { podcastId } = useParams();
     const location = useLocation();
     const selectedPodcast = allPodcastsData.find(podcast => podcast.id === podcastId);
 
-    // State untuk mengelola review yang ditampilkan secara lokal
+    const currentUserId = 'user';
+    const currentUserInfo = {
+        id: currentUserId,
+        name: 'userPods',
+        handle: '@podssfinder',
+        avatarSrc: AvatarMichelle,
+    };
+
     const [reviews, setReviews] = useState([]);
-    // State untuk input review baru
     const [newReviewText, setNewReviewText] = useState('');
+    const [newReviewRating, setNewReviewRating] = useState('5.0');
+    const [editingReviewId, setEditingReviewId] = useState(null);
 
     const [isAddPlaylistPopupOpen, setIsAddPlaylistPopupOpen] = useState(false);
     const [podcastToAddId, setPodcastToAddId] = useState(null);
 
-    // Mengisi state 'reviews' saat komponen dimuat atau podcast berubah
     useEffect(() => {
         if (selectedPodcast) {
-            // Pastikan Anda membuat salinan array reviews agar tidak memodifikasi data asli
-            setReviews([...selectedPodcast.reviews]);
+            setReviews(selectedPodcast.reviews.map(review => ({
+                ...review,
+                id: review.id || Date.now().toString() + Math.random().toString().substring(2, 8),
+                userId: review.userId || 'user-unknown',
+                rating: review.rating || '5.0'
+            })));
         }
     }, [selectedPodcast]);
 
@@ -114,14 +229,18 @@ export const Detail = () => {
         if (podcastToAddToPlaylist) {
             const targetPlaylist = playlistsData.find(p => p.id === playlistId);
             if (targetPlaylist) {
-                const episodeExists = targetPlaylist.episodes.some(ep => ep.id === podcastToAddToPlaylist.id);
+                const episodeExists = targetPlaylist.episodes.some(ep => ep.podcastId === podcastToAddToPlaylist.id);
                 if (!episodeExists) {
                     targetPlaylist.episodes.push({
                         id: podcastToAddToPlaylist.id,
-                        image: podcastToAddToPlaylist.image || PlaceholderImage,
+                        image: podcastToAddToPlaylist.coverImage || PlaceholderImage,
                         podcastTitle: podcastToAddToPlaylist.channel,
                         episodeTitle: podcastToAddToPlaylist.title,
-                        rating: podcastToAddToPlaylist.rating
+                        rating: podcastToAddToPlaylist.rating,
+                        podcastId: podcastToAddToPlaylist.id,
+                        channelId: podcastToAddToPlaylist.channelId,
+                        channel: podcastToAddToPlaylist.channel,
+                        title: podcastToAddToPlaylist.title
                     });
                     console.log(`Podcast "${podcastToAddToPlaylist.title}" berhasil ditambahkan ke "${targetPlaylist.title}"`);
                 } else {
@@ -132,25 +251,60 @@ export const Detail = () => {
         handleCloseAddPlaylistPopup();
     };
 
-    // Fungsi untuk menambahkan review baru
+    const hasUserReviewed = reviews.some(review => review.userId === currentUserId);
+
     const handleAddReview = () => {
         if (newReviewText.trim() === '') {
             alert('Review tidak boleh kosong!');
             return;
         }
 
+        if (hasUserReviewed) {
+            alert('Anda hanya dapat memberikan satu review untuk podcast ini.');
+            return;
+        }
+
         const newReview = {
-            // Gunakan AvatarUser yang sudah diimpor dari podcastsData.js
-            avatarSrc: AvatarMichelle, // Pastikan AvatarUser diimport dan ada di podcastsData.js
-            name: 'Michelle', // Nama default untuk pengguna yang menambahkan review
-            handle: '@cellow', // Handle default
+            id: Date.now().toString() + Math.random().toString().substring(2, 8),
+            avatarSrc: currentUserInfo.avatarSrc,
+            name: currentUserInfo.name,
+            handle: currentUserInfo.handle,
+            userId: currentUserInfo.id,
             reviewText: newReviewText.trim(),
+            rating: newReviewRating
         };
 
-        // Perbarui state reviews dengan review baru di paling atas
         setReviews([newReview, ...reviews]);
-        // Kosongkan input setelah review ditambahkan
         setNewReviewText('');
+        setNewReviewRating('5.0');
+    };
+
+    const handleDeleteReview = (reviewIdToDelete) => {
+        const isConfirmed = window.confirm("Apakah Anda yakin ingin menghapus review ini?");
+        if (isConfirmed) {
+            setReviews(prevReviews => prevReviews.filter(review => review.id !== reviewIdToDelete));
+            console.log(`Review dengan ID ${reviewIdToDelete} dihapus dari state.`);
+        }
+    };
+
+    const handleEditReview = (idToEdit, currentText, currentRating) => {
+        setEditingReviewId(idToEdit);
+    };
+
+    const handleSaveEditedReview = (idToSave, newText, newRating) => {
+        if (newText.trim() === '') {
+            alert('Review tidak boleh kosong setelah diedit!');
+            return;
+        }
+        setReviews(prevReviews => prevReviews.map(review =>
+            review.id === idToSave ? { ...review, reviewText: newText.trim(), rating: newRating } : review
+        ));
+        setEditingReviewId(null);
+        console.log(`Review dengan ID ${idToSave} diperbarui.`);
+    };
+
+    const handleCancelEditReview = () => {
+        setEditingReviewId(null);
     };
 
     useEffect(() => {
@@ -181,8 +335,8 @@ export const Detail = () => {
 
                 <section className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-12">
                     <div className="relative w-full md:w-2/5 flex justify-center items-center">
-                        <img src={selectedPodcast.image} alt={`${selectedPodcast.title} Background`} className="w-full h-auto max-h-[350px] object-cover rounded-lg opacity-50"/>
-                        <img src={selectedPodcast.image} alt={`${selectedPodcast.title} Cover`} className="absolute inset-0 m-auto w-3/5 md:w-3/4 max-w-[173px] h-auto object-cover rounded-lg shadow-lg"/>
+                        <img src={selectedPodcast.coverImage || PlaceholderImage} alt={`${selectedPodcast.title} Background`} className="w-full h-auto max-h-[350px] object-cover rounded-lg opacity-50"/>
+                        <img src={selectedPodcast.coverImage || PlaceholderImage} alt={`${selectedPodcast.title} Cover`} className="absolute inset-0 m-auto w-3/5 md:w-3/4 max-w-[173px] h-auto object-cover rounded-lg shadow-lg"/>
                     </div>
 
                     <div className="w-full md:w-3/5 text-center md:text-left">
@@ -200,10 +354,7 @@ export const Detail = () => {
                             {selectedPodcast.description}
                         </p>
                         <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-6">
-                          
-
-                            {/* Tombol "Review" utama */}
-                            <button className="bg-transparent border-2 border-[#3c6255] rounded-md px-6 py-2 text-[#3c6255] flex items-center justify-center hover:bg-[#d0c69d] transition-colors duration-300 text-base"
+                            <button className="bg-transparent border-2 border-[#3c6255] rounded-md px-6 py-2 text-[#3c6255] flex items-center justify-center hover:bg-[#d0c69d] transition-colors duration-300 text-xl"
                                 onClick={() => {
                                     const targetInput = document.getElementById('add-review-input');
                                     if (targetInput) {
@@ -214,7 +365,6 @@ export const Detail = () => {
                             >
                                 <i className="ri-edit-2-line mr-2"></i> Review
                             </button>
-                            {/* Tombol "Playlist" utama */}
                             <button
                                 className="bg-transparent border-2 border-[#3c6255] rounded-md px-6 py-2 text-[#3c6255] flex items-center justify-center hover:bg-[#d0c69d] transition-colors duration-300 text-base"
                                 onClick={() => handleOpenAddPlaylistPopup(selectedPodcast.id)}
@@ -234,7 +384,7 @@ export const Detail = () => {
                     <div className="flex flex-col space-y-8">
                         {selectedPodcast.episodes.map((episode, index) => (
                             <EpisodeCard
-                                key={index}
+                                key={episode.id || index}
                                 title={episode.title}
                                 date={episode.date}
                                 description={episode.description}
@@ -242,54 +392,6 @@ export const Detail = () => {
                         ))}
                     </div>
                 </section>
-
-                <div className="w-full border-b-2 border-[#3C6255] my-12"></div>
-
-                {/* Bagian Input Review yang Diperbarui */}
-                <section id="review-section" className="mb-12">
-                    <div className="w-full p-6 bg-[#a6bb8d]/50 rounded-md overflow-hidden mb-6 flex items-center">
-                        <div className="w-[70px] h-[70px] rounded-full overflow-hidden mr-4">
-                            {/* Menggunakan AvatarUser yang diimport dari podcastsData.js */}
-                            <img src={AvatarMichelle} alt="User Avatar" className="w-full h-full object-cover"/>
-                        </div>
-                        <input
-                            id="add-review-input"
-                            className="flex-grow text-base text-left text-[#3c6255]/90 p-2 rounded-md bg-transparent border-none focus:outline-none"
-                            placeholder='Add a review...'
-                            value={newReviewText} // Binding nilai input ke state
-                            onChange={(e) => setNewReviewText(e.target.value)} // Mengupdate state saat input berubah
-                            onKeyPress={(e) => { // Menambahkan review saat Enter ditekan
-                                if (e.key === 'Enter') {
-                                    handleAddReview();
-                                }
-                            }}
-                        />
-                        {/* Tombol untuk Submit Review */}
-                        <button
-                            onClick={handleAddReview}
-                            className="ml-4 px-4 py-2 bg-[#3c6255] rounded-md text-[#eae7b1] hover:bg-[#2c4f43] transition-colors"
-                        >
-                            Submit
-                        </button>
-                    </div>
-
-                    <div className="flex flex-col">
-                        {reviews.length > 0 ? (
-                            reviews.map((review, index) => (
-                                <ReviewCard
-                                    key={index}
-                                    avatarSrc={review.avatarSrc}
-                                    name={review.name}
-                                    handle={review.handle}
-                                    reviewText={review.reviewText}
-                                />
-                            ))
-                        ) : (
-                            <p className="text-base text-left text-[#3c6255]">Belum ada review untuk podcast ini.</p>
-                        )}
-                    </div>
-                </section>
-
 
                 <div className="w-full border-b-2 border-[#3C6255] my-12"></div>
 
@@ -307,9 +409,9 @@ export const Detail = () => {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {selectedPodcast.relatedPodcasts.length > 0 ? (
-                            selectedPodcast.relatedPodcasts.map((related, index) => (
+                            selectedPodcast.relatedPodcasts.map((related) => (
                                 <RelatedPodcastCard
-                                    key={index}
+                                    key={related.id}
                                     id={related.id}
                                     title={related.title}
                                     channel={related.channel}
@@ -320,6 +422,98 @@ export const Detail = () => {
                             ))
                         ) : (
                             <p className="text-base text-left text-[#3c6255]">Tidak ada podcast terkait.</p>
+                        )}
+                    </div>
+                </section>
+
+                <div className="w-full border-b-2 border-[#3C6255] my-12"></div>
+
+                <section id="review-section" className="mb-12">
+                    <h2 className="text-2xl font-semibold text-left text-[#3c6255] mb-6">Reviews</h2>
+                    <div className="w-full p-6 bg-[#a6bb8d]/50 rounded-md overflow-hidden mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center flex-shrink-0 mb-4 sm:mb-0">
+                            <div className="w-[70px] h-[70px] rounded-full overflow-hidden mr-4">
+                                <img src={currentUserInfo.avatarSrc} alt="User Avatar" className="w-full h-full object-cover"/>
+                            </div>
+                        </div>
+
+                        <input
+                            id="add-review-input"
+                            className="flex-grow text-base text-left text-[#3c6255]/90 p-2 rounded-md bg-transparent border-b-2 border-[#3c6255] focus:outline-none focus:border-[#2c4f43] transition-colors w-full"
+                            placeholder='Tambahkan review...'
+                            value={newReviewText}
+                            onChange={(e) => setNewReviewText(e.target.value)}
+                            onKeyPress={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleAddReview();
+                                }
+                            }}
+                            disabled={hasUserReviewed} // --- Dinonaktifkan jika pengguna sudah me-review ---
+                        />
+
+                        <div className="flex-shrink-0 relative ml-4">
+                        {/* <i className="ri-star-s-fill px-2 py-3 bg-[#3c6255] rounded-md text-[#eae7b1] appearance-none hover:bg-[#2c4f43] transition-colors"></i> */}
+                        <i className="ri-star-s-fill text-2xl pr-2 text-yellow-500"></i>
+                            <select
+                                className="px-4 py-2 bg-[#3c6255] rounded-md text-[#eae7b1] cursor-pointer appearance-none pr-8 hover:bg-[#2c4f43] transition-colors"
+                                value={newReviewRating}
+                                onChange={(e) => setNewReviewRating(e.target.value)}
+                                disabled={hasUserReviewed} 
+                            >
+                            
+                                <option value="5.0">5.0</option>
+                                <option value="4.5">4.5</option>
+                                <option value="4.0">4.0</option>
+                                <option value="3.5">3.5</option>
+                                <option value="3.0">3.0</option>
+                                <option value="2.5">2.5</option>
+                                <option value="2.0">2.0</option>
+                                <option value="1.5">1.5</option>
+                                <option value="1.0">1.0</option>
+                            </select>
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[#eae7b1]">
+                                <i className="ri-arrow-down-s-fill"></i>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={handleAddReview}
+                            className={`ml-4 px-6 py-2 rounded-md text-[#eae7b1] transition-colors flex-shrink-0
+                                ${hasUserReviewed ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#3c6255] hover:bg-[#2c4f43]'}`}
+                            disabled={hasUserReviewed} // --- Dinonaktifkan jika pengguna sudah me-review ---
+                        >
+                            Submit
+                        </button>
+                    </div>
+
+                    {hasUserReviewed && (
+                        <p className="text-base text-center text-[#3c6255] mt-2">
+                            {/* Anda sudah memberikan review untuk podcast ini. */}
+                        </p>
+                    )}
+
+                    <div className="flex flex-col">
+                        {reviews.length > 0 ? (
+                            reviews.map((review) => (
+                                <ReviewCard
+                                    key={review.id}
+                                    id={review.id}
+                                    avatarSrc={review.avatarSrc}
+                                    name={review.name}
+                                    handle={review.handle}
+                                    reviewText={review.reviewText}
+                                    rating={review.rating}
+                                    onDelete={handleDeleteReview}
+                                    onEdit={handleEditReview}
+                                    onSaveEdit={handleSaveEditedReview}
+                                    onCancelEdit={handleCancelEditReview}
+                                    reviewUserId={review.userId}
+                                    currentUserId={currentUserId}
+                                    isEditing={editingReviewId === review.id}
+                                />
+                            ))
+                        ) : (
+                            <p className="text-base text-left text-[#3c6255]">Belum ada review untuk podcast ini.</p>
                         )}
                     </div>
                 </section>
