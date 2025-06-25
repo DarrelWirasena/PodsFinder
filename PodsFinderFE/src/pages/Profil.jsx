@@ -76,24 +76,46 @@ export const Profil = () => {
 
   const { user, token, setUser, setToken } = useStateContext()
 
+  // useEffect(() => {
+  //   if (!token) return;
+
+  //   axiosClient.get('/user').then(({ data }) => {
+  //     setUser(data);
+  //   });
+
+  //   axiosClient.get('/playlists').then(({ data }) => {
+  //     const userPlaylists = data.data.filter(p => p.user?.id === user?.id);
+  //     setPlaylists(userPlaylists);
+  //   });
+
+  //   if (user?.id) {
+  //     axiosClient.get(`/users/${user.id}/reviewed-podcasts`).then(({ data }) => {
+  //       setReviewedPodcasts(data.data);
+  //     });
+  //   }
+  // }, [token, user?.id]);
+
   useEffect(() => {
     if (!token) return;
 
     axiosClient.get('/user').then(({ data }) => {
       setUser(data);
     });
+  }, [token]);
 
-    axiosClient.get('/playlists').then(({ data }) => {
-      const userPlaylists = data.data.filter(p => p.user?.id === user?.id);
-      setPlaylists(userPlaylists);
-    });
-
+  useEffect(() => {
     if (user?.id) {
+      axiosClient.get('/playlists').then(({ data }) => {
+        const userPlaylists = data.data.filter(p => p.user?.id === user.id);
+        setPlaylists(userPlaylists);
+      });
+
       axiosClient.get(`/users/${user.id}/reviewed-podcasts`).then(({ data }) => {
         setReviewedPodcasts(data.data);
       });
     }
-  }, [token, user?.id]);
+  }, [user?.id]);
+
 
   const onLogout = (ev) => {
     ev.preventDefault();

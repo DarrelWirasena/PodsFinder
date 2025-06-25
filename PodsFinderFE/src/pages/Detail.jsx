@@ -16,7 +16,7 @@ import RelatedPodcastCard from '../components/RelatedPodcastCard';
 export const Detail = () => {
   const { podcastId } = useParams();
   const location = useLocation();
-  const { user, setUser } = useStateContext();
+  const { user, token, setUser } = useStateContext();
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedPodcast, setSelectedPodcast] = useState(null);
@@ -27,6 +27,8 @@ export const Detail = () => {
   const [newReviewText, setNewReviewText] = useState('');
   const [editingReviewId, setEditingReviewId] = useState(null);
   const [newReviewRating, setNewReviewRating] = useState('5');
+  const [initialSelectedPlaylistIds, setInitialSelectedPlaylistIds] = useState([]);
+
 
   useEffect(() => {
     axiosClient.get('/user')
@@ -66,10 +68,22 @@ export const Detail = () => {
     }
   }, [user]);
 
+  const getSelectedPlaylistsForPodcast = (podcastId) => {
+    return playlists
+      .filter(pl => pl.podcasts?.some(p => p.id === podcastId)) // periksa apakah ada podcast dalam relasi
+      .map(pl => pl.id); // ambil hanya id-nya
+  };
+
 
   const handleOpenAddPlaylistPopup = (id) => {
-    setPodcastToAddId(id);
-    setIsAddPlaylistPopupOpen(true);
+    if (!token) {
+      alert('Harus Login!');
+      return;
+    }
+    setPodcastToAddId(id); // simpan id podcast yang ingin ditambahkan
+    const selectedIds = getSelectedPlaylistsForPodcast(id); // cari playlist yang sudah punya podcast ini
+    setInitialSelectedPlaylistIds(selectedIds); // set ke state
+    setIsAddPlaylistPopupOpen(true); // buka popup
   };
 
   const handleCloseAddPlaylistPopup = () => {
@@ -124,8 +138,40 @@ export const Detail = () => {
       });
   };
 
+  const handleCreateNewPlaylist = async (newName) => {
+    if (!newName || newName.trim() === '') {
+      alert('Nama playlist tidak boleh kosong.');
+      return null;
+    }
+
+    try {
+      const { data } = await axiosClient.post('/playlists', {
+        title: newName.trim(),
+        user_id: user.id
+      });
+
+      // Tambahkan playlist baru langsung ke daftar yang ada tanpa fetch ulang
+      setPlaylists(prev => [...prev, data.data]);
+
+      return data.data.id;
+    } catch (error) {
+      console.error(error);
+      if (error.response?.status === 422) {
+        alert('Gagal validasi: ' + JSON.stringify(error.response.data.errors));
+      } else {
+        alert('Gagal membuat playlist');
+      }
+      return null;
+    }
+  };
+
+
 
   const handleSubmitReview = () => {
+    if (!token) {
+      alert('Harus Login!');
+      return;
+    }
   if (!newReviewText) return;
     axiosClient.post(`/podcasts/${podcastId}/reviews`, {
       comment: newReviewText,
@@ -143,26 +189,26 @@ export const Detail = () => {
     .catch(console.error);
   };
 
-  const handleAddToPlaylist = (playlistId) => {
-    if (!podcastToAddId) return;
+  const handleAddToPlaylist = async (playlistIds, podcastId) => {
+    if (!podcastId || !Array.isArray(playlistIds) || playlistIds.length === 0) return;
 
-    axiosClient.post(`/playlists/${playlistId}/add`, {
-      podcast_id: podcastToAddId
-    })
-      .then(() => {
-        return axiosClient.get('/playlists');
-      })
-      .then(({ data }) => {
-        setPlaylists(data.data);
-        handleCloseAddPlaylistPopup(); // baru tutup popup setelah playlist sukses di-refresh
-      })
-      .catch(err => {
-        if (err.response?.status === 422) {
-          alert("Podcast sudah ada dalam playlist.");
-        } else {
-          console.error(err);
-        }
-      });
+    try {
+      for (let id of playlistIds) {
+        await axiosClient.post(`/playlists/${id}/add`, {
+          podcast_id: podcastId,
+        });
+      }
+
+      const updated = await axiosClient.get('/playlists');
+      setPlaylists(updated.data.data);
+      handleCloseAddPlaylistPopup();
+    } catch (error) {
+      if (error.response?.status === 422) {
+        alert('Podcast sudah ada dalam salah satu playlist.');
+      } else {
+        console.error(error);
+      }
+    }
   };
 
   if (selectedPodcast === null) {
@@ -375,6 +421,9 @@ export const Detail = () => {
         onClose={handleCloseAddPlaylistPopup}
         playlists={playlists}
         onAddToPlaylist={handleAddToPlaylist}
+        onCreateNewPlaylist={handleCreateNewPlaylist}
+        currentPodcastId={podcastToAddId}
+        initialSelectedPlaylistIds={initialSelectedPlaylistIds}
       />
 
     </div>

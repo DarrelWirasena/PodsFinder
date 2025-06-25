@@ -54,7 +54,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Playlist Custom Actions
     Route::post('/playlists/{id}/add', [PlaylistController::class, 'addPodcast']);
-    Route::delete('/playlists/{id}/remove', [PlaylistController::class, 'removePodcast']);
+    Route::delete('/playlists/{playlist}/podcasts/{podcast}', [PlaylistController::class, 'removePodcast']);
+    // Route::delete('/playlists/{id}/remove', [PlaylistController::class, 'removePodcast']);
 
     // Podcast Episodes (manual routes)
     Route::get('/podcasts/{podcast}/episodes', [EpisodeController::class, 'index']);

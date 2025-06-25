@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\PlaylistResource;
 use App\Http\Resources\PodcastResource;
 use Symfony\Component\HttpFoundation\Response; // untuk HTTP code 403 dan 422
 use App\Http\Controllers\Controller;
 use App\Models\Playlist;
+use App\Models\Podcast;
 use Illuminate\Http\Request;
 
 class PlaylistController extends Controller
@@ -21,7 +23,12 @@ class PlaylistController extends Controller
      */
     public function index()
     {
-        $playlists = Playlist::with('podcasts')->get();
+        $user = Auth::user();
+
+        $playlists = Playlist::with('user', 'podcasts')
+            ->where('user_id', $user->id)
+            ->get();
+
         return PlaylistResource::collection($playlists);
     }
 
@@ -41,13 +48,15 @@ class PlaylistController extends Controller
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'title' => 'required|string|max:200',
-            
         ]);
 
         $playlist = Playlist::create($validated);
-        return (new PlaylistResource($playlist))->response()->setStatusCode(201);
 
+        return (new PlaylistResource($playlist->load('podcasts')))
+            ->response()
+            ->setStatusCode(201);
     }
+
 
     /**
      * Display the specified resource.
@@ -125,17 +134,10 @@ class PlaylistController extends Controller
         return new PlaylistResource($playlist);
     }
 
-    public function removePodcast(Request $request, $id)
+    public function removePodcast(Playlist $playlist, Podcast $podcast)
     {
-        $request->validate([
-            'podcast_id' => 'required|exists:podcasts,id',
-        ]);
-
-        $playlist = Playlist::findOrFail($id);
-        $playlist->podcasts()->detach($request->podcast_id);
-
+        $playlist->podcasts()->detach($podcast->id);
         return response()->json(['message' => 'Podcast removed from playlist.']);
-
     }
 
 }

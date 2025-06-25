@@ -68,18 +68,6 @@ export const HomePage = () => {
 
   if (loading) return <p>Loading podcasts...</p>;
     
-    // const featuredGenresData = homepageGenreNames.map(genreName => {
-    //     const podcasts = allPodcastsData.filter(podcast =>
-    //         podcast.info && podcast.info.genre && podcast.info.genre.toLowerCase() === genreName.toLowerCase()
-    //     );
-
-    //     const limitedPodcasts = podcasts.slice(0, 2);
-
-    //     return {
-    //         name: genreName,
-    //         podcasts: limitedPodcasts,
-    //     };
-    // }).filter(genre => genre.podcasts.length > 0); 
     const featuredGenresData = homepageGenreNames.map(genreName => {
     const matching = podcasts
       .filter(p => p.genre && p.genre.toLowerCase() === genreName.toLowerCase())

@@ -3,6 +3,7 @@ import axiosClient from '../axios-client';
 import { useParams, Link } from 'react-router-dom';
 import { PlaceholderImage } from '../data/podcastsData';
 import { playlistsData } from '../data/playlistsData'; 
+import { useStateContext } from '../contexts/ContextsPorvider';
 
 const PlaylistItem = ({
     title,
@@ -68,49 +69,84 @@ const PlaylistItem = ({
 
 export const PlaylistViewAll = ({ onTriggerConfirm }) => {
     const { playlistId } = useParams();
-    const selectedPlaylist = playlistsData.find(p => p.id === playlistId);
-
+    // const selectedPlaylist = playlistsData.find(p => p.id === playlistId);
+    const [playlist, setPlaylist] = useState(null);
     const {user,token,setUser,setToken}=useStateContext() 
+
   useEffect(() => {
-    axiosClient.get('/user')
-        .then(({data}) => {
-          setUser(data)
-        })
-    }, [])
-    if (!selectedPlaylist) {
+    if (!token) return;
+
+    axiosClient.get(`/playlists/${playlistId}`)
+      .then(({ data }) => {
+        setPlaylist(data.data); // asumsi pakai PlaylistResource
+      })
+      .catch(err => {
+        console.error("Gagal fetch playlist:", err);
+        setPlaylist(null);
+      });
+  }, [token, playlistId]);
+
+  const handleDeletePodcastFromPlaylist = async (playlistId, podcastId) => {
+        const confirmed = window.confirm("Yakin ingin menghapus podcast dari playlist?");
+        if (!confirmed) return;
+
+        try {
+            await axiosClient.delete(`/playlists/${playlistId}/podcasts/${podcastId}`);
+            const updated = await axiosClient.get(`/playlists/${playlistId}`);
+            setPlaylist(updated.data.data);
+        } catch (err) {
+            console.error(err);
+            alert("Gagal menghapus podcast dari playlist.");
+        }
+    };
+
+
+    if (!playlist) {
         return (
-            <div className='min-h-screen bg-[#eae7b1] p-4 md:p-8 flex flex-col items-center justify-center pt-24'>
-                <p className="text-2xl text-[#3c6255] mb-4">Playlist "{playlistId}" tidak ditemukan.</p>
-                <Link to="/playlist" className='bg-[#3c6255] text-[#eae7b1] px-6 py-2 rounded-md flex items-center hover:opacity-90'>
-                    <i className="ri-arrow-left-wide-fill mr-2"></i>
-                    Kembali ke Daftar Playlist
-                </Link>
+            <div className="min-h-screen bg-[#eae7b1] flex justify-center items-center pt-24">
+            <p className="text-xl text-[#3c6255]">Memuat playlist...</p>
             </div>
         );
     }
+
+    // if (!selectedPlaylist) {
+    //     return (
+    //         <div className='min-h-screen bg-[#eae7b1] p-4 md:p-8 flex flex-col items-center justify-center pt-24'>
+    //             <p className="text-2xl text-[#3c6255] mb-4">Playlist "{playlistId}" tidak ditemukan.</p>
+    //             <Link to="/playlist" className='bg-[#3c6255] text-[#eae7b1] px-6 py-2 rounded-md flex items-center hover:opacity-90'>
+    //                 <i className="ri-arrow-left-wide-fill mr-2"></i>
+    //                 Kembali ke Daftar Playlist
+    //             </Link>
+    //         </div>
+    //     );
+    // }
 
     return (
         <div className='min-h-screen bg-[#eae7b1] p-4 md:p-8 pt-24'>
             <div className="container mx-auto">
                 <div className="mb-8 ml-8 mr-8">
-                    <p className="text-3xl md:text-4xl font-bold text-left text-[#3c6255] mb-2">{selectedPlaylist.title}</p>
+                    <p className="text-3xl md:text-4xl font-bold text-left text-[#3c6255] mb-2">{playlist.title}</p>
                     <hr className="border-t-2 border-[#3c6255]" />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
-                    {selectedPlaylist.episodes.map((episode) => (
+                    {playlist.podcasts.length > 0 ? (
+                        playlist.podcasts.map(podcast => (
                         <PlaylistItem
-                            key={episode.id}
-                            title={episode.episodeTitle || episode.title} 
-                            channel={episode.podcastTitle || episode.channel} 
-                            rating={episode.rating}
-                            imageUrl={episode.image}
-                            onTriggerConfirm={onTriggerConfirm}
-                            episodeId={episode.id}
-                            podcastId={episode.podcastId} 
-                            channelId={episode.channelId} 
+                            key={podcast.id}
+                            title={podcast.title}
+                            channel={podcast.channel?.name}
+                            rating={podcast.average_rating}
+                            imageUrl={podcast.image_url ? `${import.meta.env.VITE_API_BASE_URL}/storage/podcast/${podcast.image_url}` : PlaceholderImage}
+                            onTriggerConfirm={() => handleDeletePodcastFromPlaylist(playlist.id, podcast.id)}
+                            episodeId={podcast.latest_episode?.id}
+                            podcastId={podcast.id}
+                            channelId={podcast.channel?.id}
                         />
-                    ))}
+                        ))
+                    ) : (
+                        <p className="ml-8 text-[#3c6255]">Tidak ada podcast dalam playlist ini.</p>
+                    )}
                 </div>
 
                 <div className="flex ml-8 mr-8 justify-start mt-8">
