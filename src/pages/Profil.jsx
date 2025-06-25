@@ -1,15 +1,16 @@
-import React, { useState } from 'react'; 
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import ProfileImageDefault from '../assets/images/michelle.jpg'; 
+import ProfileImageDefault from '../assets/images/michelle.jpg';
 import { PlaceholderImage } from '../data/podcastsData';
 import { dataReviewed } from '../data/dataReviewed';
-import { playlistsData } from '../data/playlistsData';
+import { playlistsData as initialPlaylistsData } from '../data/playlistsData'; 
 import EditProfil from '../components/EditProfil';
+import { AddNewPlaylist } from '../components/AddNewPlaylist'; 
 
 const UserProfile = ({ profileImage, username, handle, onClick }) => (
   <div
     className="flex items-center cursor-pointer hover:opacity-80 transition-opacity duration-200"
-    onClick={onClick} 
+    onClick={onClick}
   >
     <img src={profileImage} alt="Profile" className="w-15 h-15 rounded-full mr-4 object-cover" />
     <div>
@@ -21,7 +22,7 @@ const UserProfile = ({ profileImage, username, handle, onClick }) => (
 
 const PlaylistCard = ({ playlist }) => (
   <Link to={`/playlistviewall/${playlist.id}`} className="block bg-[#3c6255] p-2 w-auto h-auto rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-    <h2 className='text-2xl font-semibold text-[#eae7b1] mb-4'>{playlist.title}</h2>
+    <h2 className="text-2xl font-semibold text-[#eae7b1] mb-4">{playlist.title}</h2>
     <div className="flex flex-wrap gap-2 mb-4 justify-center">
       {playlist.episodes.slice(0, 4).map((episode, index) => (
         <img
@@ -38,7 +39,7 @@ const PlaylistCard = ({ playlist }) => (
 const EpisodeCard = ({ podcast }) => {
   return (
     <div className="flex items-center mb-6 p-4 border border-[#3c6255] rounded-lg shadow-sm bg-[#EAE7B1] hover:shadow-md transition-shadow duration-300">
-      <Link to={`/detail/${podcast.id}`} className="block flex-shrink-0"> {/* Link only the image and maybe title if desired */}
+      <Link to={`/detail/${podcast.id}`} className="block flex-shrink-0">
         <img
           src={podcast.image || PlaceholderImage}
           alt={podcast.title}
@@ -71,12 +72,34 @@ const EpisodeCard = ({ podcast }) => {
 
 export const Profil = () => {
   const [currentUser, setCurrentUser] = useState({
-    profileImage: ProfileImageDefault, 
+    profileImage: ProfileImageDefault,
     username: 'Michelle',
     handle: 'celow',
   });
 
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [localPlaylistsData, setLocalPlaylistsData] = useState(initialPlaylistsData); 
+  const [isAddNewPlaylistPopupOpen, setIsAddNewPlaylistPopupOpen] = useState(false); 
+
+  const handleOpenAddNewPlaylistPopup = () => {
+    setIsAddNewPlaylistPopupOpen(true);
+  };
+
+  const handleCloseAddNewPlaylistPopup = () => {
+    setIsAddNewPlaylistPopupOpen(false);
+  };
+
+  const handleCreateNewPlaylistLocally = async (playlistName, playlistImage) => {
+    const newPlaylist = {
+      id: 'pl-' + Date.now().toString() + Math.random().toString().substring(2, 8),
+      title: playlistName.trim(),
+      image: playlistImage || PlaceholderImage,
+      episodes: [], 
+    };
+    setLocalPlaylistsData(prevPlaylists => [...prevPlaylists, newPlaylist]);
+    alert(`Playlist "${playlistName}" berhasil dibuat!`);
+  };
+
   const handleSaveProfile = ({ username, profileImage }) => {
     setCurrentUser(prevUser => ({
       ...prevUser,
@@ -85,7 +108,7 @@ export const Profil = () => {
     }));
   };
 
-  const playlistsToDisplay = playlistsData.slice(0, 4);
+  const playlistsToDisplay = localPlaylistsData.slice(0, 4); 
   const reviewedPodcastsToDisplay = dataReviewed.slice(0, 3);
 
   return (
@@ -96,7 +119,7 @@ export const Profil = () => {
             profileImage={currentUser.profileImage}
             username={currentUser.username}
             handle={currentUser.handle}
-            onClick={() => setIsEditOpen(true)} 
+            onClick={() => setIsEditOpen(true)}
           />
           <Link to="/">
             <button className='bg-[#3c6255] text-[#eae7b1] px-4 py-2 rounded-md hover:opacity-90'>
@@ -107,7 +130,17 @@ export const Profil = () => {
 
         <hr className="border-t-2 border-[#3c6255] my-6" />
 
-        <h2 className="text-2xl font-bold text-[#3c6255] mb-6">Daftar Playlist</h2>
+        <div className="flex justify-between items-center mb-6"> 
+            <h2 className="text-2xl font-bold text-[#3c6255]">Daftar Playlist</h2>
+            <button
+                onClick={handleOpenAddNewPlaylistPopup} 
+                className="text-4xl text-[#3c6255] hover:text-[#2c4f43] transition-colors"
+                aria-label="Buat playlist baru"
+            >
+                <i className="ri-add-circle-fill"></i>
+            </button>
+        </div>
+        
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
           {playlistsToDisplay.map((playlist) => (
             <PlaylistCard
@@ -141,6 +174,12 @@ export const Profil = () => {
         onClose={() => setIsEditOpen(false)}
         currentUsername={currentUser.username}
         onSave={handleSaveProfile}
+      />
+
+      <AddNewPlaylist
+        isOpen={isAddNewPlaylistPopupOpen}
+        onClose={handleCloseAddNewPlaylistPopup}
+        onCreateNewPlaylist={handleCreateNewPlaylistLocally} // Teruskan fungsi untuk membuat playlist
       />
     </div>
   );

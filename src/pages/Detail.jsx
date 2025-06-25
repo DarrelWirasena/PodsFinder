@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
-import { playlistsData } from '../data/playlistsData';
+import { playlistsData } from '../data/playlistsData'; 
 import { allPodcastsData, AvatarMichelle, PlaceholderImage } from '../data/podcastsData';
 import { AddPlaylist } from '../components/AddPlaylist';
 
@@ -79,7 +79,7 @@ const ReviewCard = ({ id, avatarSrc, name, handle, reviewText, rating, onDelete,
                             </select>
                         </div>
                         <button
-                            onClick={() => onSaveEdit(id, editedReviewText, editedReviewRating)} // Kirim rating yang diedit
+                            onClick={() => onSaveEdit(id, editedReviewText, editedReviewRating)} 
                             className="text-xl text-[#3c6255] cursor-pointer hover:text-green-600 transition-colors"
                             aria-label="Simpan perubahan review"
                         >
@@ -182,6 +182,7 @@ const RelatedPodcastCard = ({ id, title, channel, coverSrc, rating, onAddToPlayl
     </Link>
 );
 
+// TIDAK ADA PROPS YANG DITERIMA UNTUK MANIPULASI PLAYLIST
 export const Detail = () => {
     const { podcastId } = useParams();
     const location = useLocation();
@@ -202,6 +203,10 @@ export const Detail = () => {
 
     const [isAddPlaylistPopupOpen, setIsAddPlaylistPopupOpen] = useState(false);
     const [podcastToAddId, setPodcastToAddId] = useState(null);
+    const [initialSelectedPlaylistIds, setInitialSelectedPlaylistIds] = useState([]); 
+
+    const [localPlaylistsData, setLocalPlaylistsData] = useState(playlistsData);
+
 
     useEffect(() => {
         if (selectedPodcast) {
@@ -212,7 +217,20 @@ export const Detail = () => {
                 rating: review.rating || '5.0'
             })));
         }
-    }, [selectedPodcast]);
+
+        const currentContentId = podcastId;
+        if (currentContentId && localPlaylistsData) {
+            const selectedIds = [];
+            localPlaylistsData.forEach(playlist => {
+                if (playlist.episodes.some(ep => ep.podcastId === currentContentId)) {
+                    selectedIds.push(playlist.id);
+                }
+            });
+            setInitialSelectedPlaylistIds(selectedIds);
+        } else {
+            setInitialSelectedPlaylistIds([]);
+        }
+    }, [selectedPodcast, podcastId, localPlaylistsData]); 
 
     const handleOpenAddPlaylistPopup = (id) => {
         setPodcastToAddId(id);
@@ -224,32 +242,65 @@ export const Detail = () => {
         setPodcastToAddId(null);
     };
 
-    const handleAddToPlaylist = (playlistId) => {
-        const podcastToAddToPlaylist = allPodcastsData.find(p => p.id === podcastToAddId);
-        if (podcastToAddToPlaylist) {
-            const targetPlaylist = playlistsData.find(p => p.id === playlistId);
-            if (targetPlaylist) {
-                const episodeExists = targetPlaylist.episodes.some(ep => ep.podcastId === podcastToAddToPlaylist.id);
-                if (!episodeExists) {
-                    targetPlaylist.episodes.push({
-                        id: podcastToAddToPlaylist.id,
-                        image: podcastToAddToPlaylist.coverImage || PlaceholderImage,
-                        podcastTitle: podcastToAddToPlaylist.channel,
-                        episodeTitle: podcastToAddToPlaylist.title,
-                        rating: podcastToAddToPlaylist.rating,
-                        podcastId: podcastToAddToPlaylist.id,
-                        channelId: podcastToAddToPlaylist.channelId,
-                        channel: podcastToAddToPlaylist.channel,
-                        title: podcastToAddToPlaylist.title
-                    });
-                    console.log(`Podcast "${podcastToAddToPlaylist.title}" berhasil ditambahkan ke "${targetPlaylist.title}"`);
-                } else {
-                    console.log(`Podcast "${podcastToAddToPlaylist.title}" sudah ada di "${targetPlaylist.title}"`);
-                }
-            }
+    const handleAddToPlaylistLocally = (selectedPlaylistIdsArray, episodeIdFromPopup) => {
+        const contentIdToUpdate = episodeIdFromPopup || podcastToAddId;
+
+        if (!contentIdToUpdate) {
+            console.warn("Tidak ada ID konten yang diberikan untuk pembaruan playlist.");
+            return;
         }
-        handleCloseAddPlaylistPopup();
+
+        setLocalPlaylistsData(prevPlaylists => {
+            const updatedPlaylists = prevPlaylists.map(playlist => {
+                const isSelected = selectedPlaylistIdsArray.includes(playlist.id);
+                const podcastExistsInPlaylist = playlist.episodes.some(ep => ep.podcastId === contentIdToUpdate);
+                
+                const podcastDetail = allPodcastsData.find(p => p.id === contentIdToUpdate);
+
+                if (podcastDetail) {
+                    const episodeInfo = {
+                        id: podcastDetail.id,
+                        image: podcastDetail.coverImage || PlaceholderImage,
+                        podcastTitle: podcastDetail.channel,
+                        episodeTitle: podcastDetail.title,
+                        rating: podcastDetail.rating,
+                        podcastId: podcastDetail.id,
+                        channelId: podcastDetail.channelId,
+                        channel: podcastDetail.channel,
+                        title: podcastDetail.title
+                    };
+
+                    if (isSelected && !podcastExistsInPlaylist) {
+                        return {
+                            ...playlist,
+                            episodes: [...playlist.episodes, episodeInfo]
+                        };
+                    } else if (!isSelected && podcastExistsInPlaylist) {
+                        return {
+                            ...playlist,
+                            episodes: playlist.episodes.filter(ep => ep.podcastId !== contentIdToUpdate)
+                        };
+                    }
+                }
+                return playlist; 
+            });
+            return updatedPlaylists;
+        });
+
+        setIsAddPlaylistPopupOpen(false);
     };
+
+    const handleCreateNewPlaylistLocally = async (playlistName) => {
+        const newPlaylist = {
+            id: 'pl-' + Date.now().toString() + Math.random().toString().substring(2, 8),
+            title: playlistName.trim(),
+            image: PlaceholderImage, 
+            episodes: [],
+        };
+        setLocalPlaylistsData(prevPlaylists => [...prevPlaylists, newPlaylist]);
+        return newPlaylist.id; 
+    };
+
 
     const hasUserReviewed = reviews.some(review => review.userId === currentUserId);
 
@@ -448,11 +499,10 @@ export const Detail = () => {
                                     handleAddReview();
                                 }
                             }}
-                            disabled={hasUserReviewed} // --- Dinonaktifkan jika pengguna sudah me-review ---
+                            disabled={hasUserReviewed} 
                         />
 
                         <div className="flex-shrink-0 relative ml-4">
-                        {/* <i className="ri-star-s-fill px-2 py-3 bg-[#3c6255] rounded-md text-[#eae7b1] appearance-none hover:bg-[#2c4f43] transition-colors"></i> */}
                         <i className="ri-star-s-fill text-2xl pr-2 text-yellow-500"></i>
                             <select
                                 className="px-4 py-2 bg-[#3c6255] rounded-md text-[#eae7b1] cursor-pointer appearance-none pr-8 hover:bg-[#2c4f43] transition-colors"
@@ -460,7 +510,6 @@ export const Detail = () => {
                                 onChange={(e) => setNewReviewRating(e.target.value)}
                                 disabled={hasUserReviewed} 
                             >
-                            
                                 <option value="5.0">5.0</option>
                                 <option value="4.5">4.5</option>
                                 <option value="4.0">4.0</option>
@@ -480,7 +529,7 @@ export const Detail = () => {
                             onClick={handleAddReview}
                             className={`ml-4 px-6 py-2 rounded-md text-[#eae7b1] transition-colors flex-shrink-0
                                 ${hasUserReviewed ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#3c6255] hover:bg-[#2c4f43]'}`}
-                            disabled={hasUserReviewed} // --- Dinonaktifkan jika pengguna sudah me-review ---
+                            disabled={hasUserReviewed} 
                         >
                             Submit
                         </button>
@@ -570,8 +619,11 @@ export const Detail = () => {
             <AddPlaylist
                 isOpen={isAddPlaylistPopupOpen}
                 onClose={handleCloseAddPlaylistPopup}
-                playlists={playlistsData}
-                onAddToPlaylist={handleAddToPlaylist}
+                playlists={localPlaylistsData} 
+                onAddToPlaylist={handleAddToPlaylistLocally} 
+                onCreateNewPlaylist={handleCreateNewPlaylistLocally} 
+                currentPodcastId={podcastToAddId}
+                initialSelectedPlaylistIds={initialSelectedPlaylistIds}
             />
         </div>
     );
