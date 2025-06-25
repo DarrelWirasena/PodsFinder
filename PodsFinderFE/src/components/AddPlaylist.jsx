@@ -15,7 +15,7 @@ export const AddPlaylist = ({ isOpen, onClose, playlists, onAddToPlaylist }) => 
                 className="w-full text-left p-3 rounded-md bg-[#3c6255] text-[#eae7b1] hover:bg-[#2c4f43] transition-colors duration-200"
                 onClick={() => onAddToPlaylist(playlist.id)}
               >
-                {playlist.title}
+                {playlist.name}
               </button>
             ))
           ) : (

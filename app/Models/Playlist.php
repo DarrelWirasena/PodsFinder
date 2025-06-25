@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Playlist extends Model
 {
 
-    protected $fillable = ['user_id', 'title', 'description'];
+    protected $fillable = ['user_id', 'title'];
 
 
     public function user()

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\Review;
+use App\Http\Resources\ReviewResource;
 use Illuminate\Http\Request;
 
 class ReviewController extends Controller
@@ -29,18 +31,23 @@ class ReviewController extends Controller
     }
 
     // POST /api/reviews
-    public function store(Request $request)
+    public function store(Request $request, $podcastId)
     {
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'podcast_id' => 'required|exists:podcasts,id',
             'rating' => 'required|integer|min:1|max:10',
             'comment' => 'nullable|string',
         ]);
 
-        $review = Review::create($validated);
-        return ReviewResource::collection($review, 201);
+        $review = new Review();
+        $review->user_id = auth()->id();
+        $review->podcast_id = $podcastId;
+        $review->rating = $validated['rating'];
+        $review->comment = $validated['comment'] ?? '';
+        $review->save();
+
+        return new ReviewResource($review);
     }
+
 
     // GET /api/reviews/{id}
     public function show($id)
@@ -49,18 +56,19 @@ class ReviewController extends Controller
         return ReviewResource::collection($review);
     }
 
-    // PUT/PATCH /api/reviews/{id}
+    // PUT /api/reviews/{id}
     public function update(Request $request, $id)
     {
         $review = Review::findOrFail($id);
 
         $validated = $request->validate([
-            'rating' => 'sometimes|required|integer|min:1|max:10',
+            'rating' => 'sometimes|required|integer|min:1|max:5',
             'comment' => 'nullable|string',
         ]);
 
         $review->update($validated);
-        return ReviewResource::collection($review);
+
+        return new ReviewResource($review);
     }
 
     // DELETE /api/reviews/{id}
@@ -68,6 +76,7 @@ class ReviewController extends Controller
     {
         $review = Review::findOrFail($id);
         $review->delete();
-        return ReviewResource::collection(['message' => 'Review deleted successfully.']);
+
+        return response()->json(['message' => 'Review deleted successfully.'], 200);
     }
 }

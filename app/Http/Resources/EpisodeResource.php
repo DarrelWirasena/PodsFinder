@@ -18,7 +18,7 @@ class EpisodeResource extends JsonResource
             'id'          => $this->id,
             'title'       => $this->title,
             'description' => $this->description,
-            'published_at'=> $this->published_at,
+            'release_date'=> $this->release_date,
             'podcast_id'  => $this->podcast_id,
         ];
     }

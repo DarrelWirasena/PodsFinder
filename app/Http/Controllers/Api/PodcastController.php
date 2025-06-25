@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\Podcast;
+use App\Http\Resources\PodcastResource;
 use Illuminate\Http\Request;
 
 class PodcastController extends Controller
@@ -10,9 +12,8 @@ class PodcastController extends Controller
 
     public function show($id)
     {
-    $podcast = Podcast::with('channel', 'episodes')->findOrFail($id);
-
-    return response()->json($podcast);
+        $podcast = Podcast::with(['channel', 'episodes', 'reviews.user'])->findOrFail($id);
+        return new PodcastResource($podcast);   
     }
 
 
@@ -21,7 +22,9 @@ class PodcastController extends Controller
      */
     public function index()
     {
-        return PodcastResource::collection(Podcast::with(['channel'])->get());
+         return PodcastResource::collection(
+            Podcast::with(['channel', 'latestEpisode', 'reviews'])->get()
+        );
     }
 
     /**
@@ -41,17 +44,6 @@ class PodcastController extends Controller
         return new PodcastResource($podcast);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    // public function show(Podcast $podcast)
-    // {
-    //     //
-    // }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Podcast $podcast)
     {
         //
@@ -89,6 +81,19 @@ class PodcastController extends Controller
     $podcast->delete();
 
     return response()->json(['message' => 'Podcast deleted successfully']);
+    }
+
+    public function related($id)
+    {
+        $podcast = Podcast::findOrFail($id);
+
+        $related = Podcast::where('id', '!=', $podcast->id)
+            ->where('genre', $podcast->genre)
+            ->latest()
+            ->take(6)
+            ->get();
+
+        return PodcastResource::collection($related);
     }
 
 }

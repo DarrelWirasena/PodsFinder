@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axiosClient from '../axios-client';
 import { Link } from 'react-router-dom';
-import { allPodcastsData, allGenresData, PlaceholderImage } from '../data/podcastsData'; 
+// import { allPodcastsData, allGenresData, PlaceholderImage } from '../data/podcastsData'; 
 import { AddPlaylist } from '../components/AddPlaylist'; 
 import { playlistsData } from '../data/playlistsData'; 
 import { useStateContext } from '../contexts/ContextsPorvider';
@@ -51,12 +51,44 @@ export const Genre = () => {
   const [isAddPlaylistPopupOpen, setIsAddPlaylistPopupOpen] = useState(false);
   const [podcastToAddId, setPodcastToAddId] = useState(null); 
   const {user,token,setUser,setToken}=useStateContext() 
+  const [podcasts, setPodcasts] = useState([]);
+  const [genres, setGenres] = useState([]);
+
   useEffect(() => {
     axiosClient.get('/user')
         .then(({data}) => {
           setUser(data)
         })
     }, [])
+  
+  useEffect(() => {
+    axiosClient.get('/podcasts')
+      .then(({ data }) => {
+        const allPodcasts = data.data;
+        setPodcasts(allPodcasts);
+
+        // Buat daftar genre unik dari data podcast
+        const genreMap = {};
+
+        allPodcasts.forEach(p => {
+          const genre = p.genre;
+          if (!genreMap[genre]) {
+            genreMap[genre] = [];
+          }
+          if (genreMap[genre].length < 2) {
+            genreMap[genre].push(p);
+          }
+        });
+
+        const genreList = Object.keys(genreMap).map(name => ({
+          name,
+          podcasts: genreMap[name]
+        }));
+
+        setGenres(genreList);
+      })
+      .catch(console.error);
+  }, []);
 
   const handleOpenAddPlaylistPopup = (id) => {
     setPodcastToAddId(id);
@@ -91,12 +123,12 @@ export const Genre = () => {
     handleCloseAddPlaylistPopup(); 
   };
 
-  const genres = allGenresData.map(genre => ({
-    ...genre,
-    podcasts: allPodcastsData.filter(podcast =>
-      podcast.info.genre === genre.name 
-    ).slice(0, 2) 
-  }));
+  // const genres = allGenresData.map(genre => ({
+  //   ...genre,
+  //   podcasts: allPodcastsData.filter(podcast =>
+  //     podcast.info.genre === genre.name 
+  //   ).slice(0, 2) 
+  // }));
 
   return (
     <div className="pb-4 pt-24 bg-[#eae7b1] min-h-screen">
@@ -107,25 +139,26 @@ export const Genre = () => {
         {genres.map((genre, index) => (
           <div key={genre.name} className="mb-12">
             <div className="flex justify-between items-center mb-6 mt-10">
-              <h2 className="text-[#3c6255] font-bold text-2xl md:text-2xl">
-                {genre.name}
-              </h2>
-              <Link to={`/genreview/${genre.name.toLowerCase().replace(/\s/g, '-')}`} className="flex items-center text-base text-[#3c6255] hover:underline">
+              <h2 className="text-[#3c6255] font-bold text-2xl md:text-2xl">{genre.name}</h2>
+              <Link
+                to={`/genreview/${genre.name.toLowerCase().replace(/\s/g, '-')}`}
+                className="flex items-center text-base text-[#3c6255] hover:underline"
+              >
                 View all <i className="ri-arrow-right-double-line ml-1"></i>
               </Link>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6">
-              {genre.podcasts.map((podcast) => (
+              {genre.podcasts.map(podcast => (
                 <PodcastCard
                   key={podcast.id}
                   id={podcast.id}
-                  image={podcast.coverImage} 
+                  image={podcast.image_url ? `${import.meta.env.VITE_API_BASE_URL}/storage/podcast/${podcast.image_url}` : PlaceholderImage}
                   title={podcast.title}
-                  channel={podcast.channel} 
-                  episode={podcast.episodes && podcast.episodes[0] ? podcast.episodes[0].title : 'No Episode Title'} 
-                  rating={podcast.rating}
-                  onAddToPlaylistClick={handleOpenAddPlaylistPopup} 
+                  channel={podcast.channel?.name || 'Unknown'}
+                  episode={podcast.latest_episode?.title || 'No Episode Title'}
+                  rating={podcast.average_rating}
+                  onAddToPlaylistClick={handleOpenAddPlaylistPopup}
                 />
               ))}
             </div>
@@ -135,6 +168,7 @@ export const Genre = () => {
             )}
           </div>
         ))}
+
       </div>
 
       <AddPlaylist

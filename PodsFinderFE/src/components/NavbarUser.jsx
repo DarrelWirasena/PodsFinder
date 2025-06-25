@@ -53,7 +53,7 @@ export const NavbarUser = ({ onSearchClick }) => {
 
     
   return (
-    <div className="box h-15 w-380 bg-[#3c6255]">
+    <div className="box h-15  bg-[#3c6255]">
         <div className={`navbar fixed w-full transition-all z-40 ${scrollActive}`}> 
             <div className="container mx-auto px-5">
                 <div className="navbar-box flex items-center justify-between ">

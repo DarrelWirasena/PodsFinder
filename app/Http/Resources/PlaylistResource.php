@@ -16,7 +16,7 @@ class PlaylistResource extends JsonResource
     {
         return [
             'id'       => $this->id,
-            'name'     => $this->name,
+            'title'     => $this->title,
             'user'     => new UserResource($this->whenLoaded('user')),
             'podcasts' => PodcastResource::collection($this->whenLoaded('podcasts')),
         ];

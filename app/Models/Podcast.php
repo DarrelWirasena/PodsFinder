@@ -21,4 +21,14 @@ class Podcast extends Model
     {
         return $this->belongsTo(Channel::class);
     }
+
+    public function latestEpisode()
+    {
+        return $this->hasOne(Episode::class)->latest('release_date');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

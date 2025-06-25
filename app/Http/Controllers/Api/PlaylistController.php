@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\PlaylistResource;
+use App\Http\Resources\PodcastResource;
+use Symfony\Component\HttpFoundation\Response; // untuk HTTP code 403 dan 422
+use App\Http\Controllers\Controller;
 use App\Models\Playlist;
 use Illuminate\Http\Request;
 
@@ -37,11 +41,12 @@ class PlaylistController extends Controller
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'title' => 'required|string|max:200',
-            'description' => 'nullable|string',
+            
         ]);
 
         $playlist = Playlist::create($validated);
-        return PodcastResource::collection($playlist, 201);
+        return (new PlaylistResource($playlist))->response()->setStatusCode(201);
+
     }
 
     /**
@@ -50,7 +55,8 @@ class PlaylistController extends Controller
     public function show($id)
     {
         $playlist = Playlist::with('podcasts')->findOrFail($id);
-        return PodcastResource::collection($playlist);
+        return new PlaylistResource($playlist);
+
     }
 
     /**
@@ -70,11 +76,12 @@ class PlaylistController extends Controller
 
         $validated = $request->validate([
             'title' => 'sometimes|required|string|max:200',
-            'description' => 'nullable|string',
+            
         ]);
 
         $playlist->update($validated);
-        return PodcastResource::collection($playlist);
+        return new PlaylistResource($playlist);
+
     }
 
     /**
@@ -85,7 +92,8 @@ class PlaylistController extends Controller
         $playlist = Playlist::findOrFail($id);
         $playlist->delete();
 
-        return PodcastResource::collection(['message' => 'Playlist deleted successfully.']);
+        return response()->json(['message' => 'Playlist deleted successfully.']);
+
     }
 
     public function addPodcast(Request $request, $id)
@@ -94,10 +102,27 @@ class PlaylistController extends Controller
             'podcast_id' => 'required|exists:podcasts,id',
         ]);
 
-        $playlist = Playlist::findOrFail($id);
-        $playlist->podcasts()->syncWithoutDetaching($request->podcast_id);
+        $playlist = Playlist::with('podcasts')->findOrFail($id);
 
-        return PodcastResource::collection(['message' => 'Podcast added to playlist.']);
+        // Cek kepemilikan playlist
+        if ($playlist->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Forbidden'], Response::HTTP_FORBIDDEN);
+        }
+
+        // ❗ Cek apakah podcast sudah ada dalam playlist
+        if ($playlist->podcasts()->where('podcast_id', $request->podcast_id)->exists()) {
+            return response()->json([
+                'message' => 'Podcast already exists in this playlist.'
+            ], Response::HTTP_UNPROCESSABLE_ENTITY); // 422
+        }
+
+        // Tambahkan podcast
+        $playlist->podcasts()->attach($request->podcast_id);
+
+        // Reload playlist lengkap
+        $playlist->load(['podcasts', 'user']);
+
+        return new PlaylistResource($playlist);
     }
 
     public function removePodcast(Request $request, $id)
@@ -109,7 +134,8 @@ class PlaylistController extends Controller
         $playlist = Playlist::findOrFail($id);
         $playlist->podcasts()->detach($request->podcast_id);
 
-        return PodcastResource::collection(['message' => 'Podcast removed from playlist.']);
+        return response()->json(['message' => 'Podcast removed from playlist.']);
+
     }
 
 }

@@ -1,22 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import axiosClient from '../axios-client';
 import { Link, Navigate } from 'react-router-dom';
-import { dataReviewed } from '../data/dataReviewed'; 
 import { useStateContext } from '../contexts/ContextsPorvider';
+import { PlaceholderImage } from '../data/podcastsData';
 
 const ReviewedPodcastCard = ({ id, image, title, episode, rating, channelId, channelName }) => {
-  const {user,token,setUser,setToken}=useStateContext() 
-  useEffect(() => {
-    axiosClient.get('/user')
-        .then(({data}) => {
-          setUser(data)
-        })
-    }, [])
   return (
-    <Link to={`/detail/${id}`} className="block"> 
-      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 p-4 rounded-lg mb-4 bg-[#EAE7B1]/20 shadow-md hover:shadow-lg transition-shadow duration-300"> 
+    <Link to={`/detail/${id}`} className="block">
+      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 p-4 rounded-lg mb-4 bg-[#EAE7B1]/20 shadow-md hover:shadow-lg transition-shadow duration-300">
         <img
-          src={image}
+          src={image || PlaceholderImage}
           alt={title}
           className="w-24 h-24 rounded-lg object-cover flex-shrink-0"
         />
@@ -25,13 +18,13 @@ const ReviewedPodcastCard = ({ id, image, title, episode, rating, channelId, cha
           <p className="text-lg font-bold text-[#3c6255] mb-2">{episode}</p>
           <div className="flex items-center justify-center sm:justify-start mt-1">
             <p className="text-base text-[#3c6255]">{rating}</p>
-            <i className="ri-star-s-fill text-[#3c6255] text-base ml-1"></i> 
+            <i className="ri-star-s-fill text-[#3c6255] text-base ml-1"></i>
           </div>
           {channelId && channelName && (
-            <Link 
-              to={`/detailchannel/${channelId}`} 
+            <Link
+              to={`/detailchannel/${channelId}`}
               className="text-sm text-[#3c6255] mt-2 hover:underline hover:text-[#2c4f43] transition-colors"
-              onClick={(e) => e.stopPropagation()} 
+              onClick={(e) => e.stopPropagation()}
             >
               Channel: {channelName} <i className="ri-share-box-line ml-1"></i>
             </Link>
@@ -43,10 +36,37 @@ const ReviewedPodcastCard = ({ id, image, title, episode, rating, channelId, cha
 };
 
 export const Reviewed = () => {
-  const reviewedPodcasts = dataReviewed; 
-  const {token} = useStateContext()
-  if (!token){
-    return <Navigate to="/login"/>
+  const { token } = useStateContext();
+  const [reviewedPodcasts, setReviewedPodcasts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!token) return;
+
+    axiosClient.get('/user')
+      .then(({ data: user }) => {
+        return axiosClient.get(`/users/${user.id}/reviewed-podcasts`);
+      })
+      .then(({ data }) => {
+        setReviewedPodcasts(data.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, [token]);
+
+  if (!token) {
+    return <Navigate to="/login" />;
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex justify-center items-center text-[#3c6255] text-xl">
+        Loading reviewed podcasts...
+      </div>
+    );
   }
 
   return (
@@ -60,19 +80,23 @@ export const Reviewed = () => {
         <hr className="border-t-2 border-[#3c6255] w-full" />
       </div>
 
-      <div className="flex flex-col gap-4"> 
-        {reviewedPodcasts.map((podcast) => (
-          <ReviewedPodcastCard
-            key={podcast.id}
-            id={podcast.id} 
-            image={podcast.image}
-            title={podcast.title}
-            episode={podcast.episode}
-            rating={podcast.rating}
-            channelId={podcast.channelId}
-            channelName={podcast.channelName}
-          />
-        ))}
+      <div className="flex flex-col gap-4">
+        {reviewedPodcasts.length > 0 ? (
+          reviewedPodcasts.map((podcast) => (
+            <ReviewedPodcastCard
+              key={podcast.id}
+              id={podcast.id}
+              image={podcast.image_url ? `${import.meta.env.VITE_API_BASE_URL}/storage/podcast/${podcast.image_url}` : PlaceholderImage}
+              title={podcast.title}
+              episode={podcast.latest_episode?.title || 'No episode info'}
+              rating={podcast.average_rating || 0}
+              channelId={podcast.channel?.id}
+              channelName={podcast.channel?.name}
+            />
+          ))
+        ) : (
+          <p className="text-base text-[#3c6255]">You haven't reviewed any podcast yet.</p>
+        )}
       </div>
     </div>
   );

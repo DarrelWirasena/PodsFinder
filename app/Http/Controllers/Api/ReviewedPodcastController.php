@@ -17,13 +17,16 @@ class ReviewedPodcastController extends Controller
      */
     public function index($userId)
     {
-        if (auth()->id() !== $user->id) {
+        if (auth()->id() !== (int) $userId) {
             return response()->json(['message' => 'Forbidden'], Response::HTTP_FORBIDDEN);
         }
 
         $podcasts = Podcast::whereHas('reviews', function ($query) use ($userId) {
             $query->where('user_id', $userId);
-        })->distinct()->get();
+        })
+        ->with(['latestEpisode', 'channel', 'reviews']) // <-- tambahkan ini
+        ->distinct()
+        ->get();
 
         return PodcastResource::collection($podcasts);
     }

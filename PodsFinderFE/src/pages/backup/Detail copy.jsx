@@ -5,7 +5,7 @@ import { useParams, Link, useLocation } from 'react-router-dom';
 import axiosClient from '../axios-client';
 import { useStateContext } from '../contexts/ContextsPorvider';
 import { AddPlaylist } from '../components/AddPlaylist';
-// import { playlistsData } from '../data/playlistsData';
+import { playlistsData } from '../data/playlistsData';
 import { PlaceholderImage } from '../data/podcastsData';
 
 // Card components
@@ -18,26 +18,15 @@ export const Detail = () => {
   const location = useLocation();
   const { user, setUser } = useStateContext();
 
-  const [isDeleting, setIsDeleting] = useState(false);
   const [selectedPodcast, setSelectedPodcast] = useState(null);
-  const [playlists, setPlaylists] = useState([]);
   const [relatedPodcasts, setRelatedPodcasts] = useState([]);
   const [isAddPlaylistPopupOpen, setIsAddPlaylistPopupOpen] = useState(false);
   const [podcastToAddId, setPodcastToAddId] = useState(null);
-  const [newReviewText, setNewReviewText] = useState('');
-  const [editingReviewId, setEditingReviewId] = useState(null);
-  const [newReviewRating, setNewReviewRating] = useState('5');
-
-  useEffect(() => {
-    axiosClient.get('/user')
-      .then(({ data }) => setUser(data))
-      .catch(console.error);
-  }, []);
 
   useEffect(() => {
     axiosClient.get(`/podcasts/${podcastId}`)
       .then(({ data }) => {
-        setSelectedPodcast(data.data);
+        setSelectedPodcast(data);
       })
       .catch(() => setSelectedPodcast(null));
   }, [podcastId]);
@@ -49,6 +38,12 @@ export const Detail = () => {
   }, [podcastId]);
 
   useEffect(() => {
+    axiosClient.get('/user')
+      .then(({ data }) => setUser(data))
+      .catch(console.error);
+  }, []);
+
+  useEffect(() => {
     if (location.hash) {
       const element = document.getElementById(location.hash.substring(1));
       if (element) {
@@ -57,15 +52,6 @@ export const Detail = () => {
       }
     }
   }, [location]);
-
-  useEffect(() => {
-    if (user) {
-      axiosClient.get('/playlists')
-        .then(({ data }) => setPlaylists(data.data))
-        .catch(console.error);
-    }
-  }, [user]);
-
 
   const handleOpenAddPlaylistPopup = (id) => {
     setPodcastToAddId(id);
@@ -77,92 +63,23 @@ export const Detail = () => {
     setPodcastToAddId(null);
   };
 
-  // Fungsi untuk mulai edit review
-  const handleEditReview = (id, comment, rating) => {
-    setEditingReviewId(id);
-    setNewReviewText(comment);
-    setNewReviewRating(String(rating)); // rating harus dalam string agar sesuai dengan <select>
-  };
-
-  // Fungsi untuk batalkan edit
-  const handleCancelEdit = () => {
-    setEditingReviewId(null);
-    setNewReviewText('');
-    setNewReviewRating('5.0');
-  };
-
-  // Fungsi untuk simpan hasil edit
-  const handleSaveEditReview = (id, comment, rating) => {
-    axiosClient.put(`/reviews/${id}`, {
-      comment,
-      rating: parseInt(rating)
-    })
-    .then(() => axiosClient.get(`/podcasts/${podcastId}`))
-    .then(({ data }) => {
-      setSelectedPodcast(data.data);
-      setEditingReviewId(null);
-      setNewReviewText('');
-      setNewReviewRating('5.0');
-    })
-    .catch(console.error);
-  };
-
-// Fungsi untuk hapus review
-  const handleDeleteReview = (id) => {
-    if (!confirm('Yakin ingin menghapus review ini?')) return;
-
-    setIsDeleting(true); // mulai loading
-
-    axiosClient.delete(`/reviews/${id}`)
-      .then(() => axiosClient.get(`/podcasts/${podcastId}`))
-      .then(({ data }) => {
-        setSelectedPodcast(data.data); // pastikan ini .data (karena dari resource API)
-      })
-      .catch(console.error)
-      .finally(() => {
-        setIsDeleting(false); // selesai loading
-      });
-  };
-
-
-  const handleSubmitReview = () => {
-  if (!newReviewText) return;
-    axiosClient.post(`/podcasts/${podcastId}/reviews`, {
-      comment: newReviewText,
-      rating: parseInt(newReviewRating)
-    })
-    .then(() => {
-      setNewReviewText('');
-      setNewReviewRating('5.0');
-      // refresh reviews
-      return axiosClient.get(`/podcasts/${podcastId}`);
-    })
-    .then(({ data }) => {
-      setSelectedPodcast(data.data);
-    })
-    .catch(console.error);
-  };
-
   const handleAddToPlaylist = (playlistId) => {
-    if (!podcastToAddId) return;
+    const podcastToAdd = selectedPodcast;
+    const targetPlaylist = playlistsData.find(p => p.id === playlistId);
 
-    axiosClient.post(`/playlists/${playlistId}/add`, {
-      podcast_id: podcastToAddId
-    })
-      .then(() => {
-        return axiosClient.get('/playlists');
-      })
-      .then(({ data }) => {
-        setPlaylists(data.data);
-        handleCloseAddPlaylistPopup(); // baru tutup popup setelah playlist sukses di-refresh
-      })
-      .catch(err => {
-        if (err.response?.status === 422) {
-          alert("Podcast sudah ada dalam playlist.");
-        } else {
-          console.error(err);
-        }
-      });
+    if (podcastToAdd && targetPlaylist) {
+      const exists = targetPlaylist.episodes.some(ep => ep.id === podcastToAdd.id);
+      if (!exists) {
+        targetPlaylist.episodes.push({
+          id: podcastToAdd.id,
+          image: `/storage/podcast/${podcastToAdd.image_url}`,
+          podcastTitle: podcastToAdd.channel?.name,
+          episodeTitle: podcastToAdd.title,
+          rating: podcastToAdd.rating
+        });
+      }
+    }
+    handleCloseAddPlaylistPopup();
   };
 
   if (selectedPodcast === null) {
@@ -184,8 +101,8 @@ export const Detail = () => {
         {/* Header */}
         <section className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-12">
           <div className="relative w-full md:w-2/5 flex justify-center items-center">
-            <img src={selectedPodcast.image_url ? `${import.meta.env.VITE_API_BASE_URL}/storage/podcast/${selectedPodcast.image_url}` : PlaceholderImage} alt="Background" className="w-full max-h-[350px] object-cover rounded-lg opacity-50"/>
-            <img src={selectedPodcast.image_url ? `${import.meta.env.VITE_API_BASE_URL}/storage/podcast/${selectedPodcast.image_url}` : PlaceholderImage} alt="Cover" className="absolute inset-0 m-auto w-3/5 md:w-3/4 max-w-[173px] object-cover rounded-lg shadow-lg"/>
+            <img src={`/storage/podcast/${selectedPodcast.image_url}`} alt="Background" className="w-full max-h-[350px] object-cover rounded-lg opacity-50"/>
+            <img src={`/storage/podcast/${selectedPodcast.image_url}`} alt="Cover" className="absolute inset-0 m-auto w-3/5 md:w-3/4 max-w-[173px] object-cover rounded-lg shadow-lg"/>
           </div>
 
           <div className="w-full md:w-3/5 text-center md:text-left">
@@ -194,7 +111,7 @@ export const Detail = () => {
             </Link>
             <h1 className="text-4xl md:text-5xl font-semibold text-[#3c6255] mb-4">{selectedPodcast.title}</h1>
             <div className="flex items-center justify-center md:justify-start mb-4">
-              <p className="text-4xl text-[#3c6255] mr-2">{selectedPodcast.average_rating}</p>
+              <p className="text-4xl text-[#3c6255] mr-2">{selectedPodcast.rating}</p>
               <span className="text-4xl text-[#3c6255]">
                 <i className="ri-star-s-fill"></i>
               </span>
@@ -243,7 +160,7 @@ export const Detail = () => {
                   id={rel.id}
                   title={rel.title}
                   channel={rel.channel?.name}
-                  coverSrc={rel.image_url ? `${import.meta.env.VITE_API_BASE_URL}/storage/podcast/${rel.image_url}` : PlaceholderImage}
+                  coverSrc={`/storage/podcast/${rel.image_url}`}
                   rating={rel.average_rating}
                   onAddToPlaylistClick={handleOpenAddPlaylistPopup}
                 />
@@ -256,77 +173,30 @@ export const Detail = () => {
 
         {/* Reviews */}
         <div className="border-b-2 border-[#3C6255] my-12"></div>
-          <section className="mb-12" id="review-section">
-            <div className="relative w-full p-6 bg-[#a6bb8d]/80 rounded-md overflow-hidden mb-6 flex flex-col">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-[50px] h-[50px] rounded-full overflow-hidden">
-                  <img src={`/storage/profile/${user?.img_url}`} alt="User Avatar" className="w-full h-full object-cover" />
-                </div>
-                <div>
-                  <p className="text-lg font-semibold text-left text-[#3c6255]">{user?.name}</p>
-                  <p className="text-base text-left text-[#3c6255]">{user?.email}</p>
-                </div>
-                <div className="ml-auto flex items-center gap-2">
-                  <i className="ri-star-s-fill text-yellow-500 text-lg mr-1"></i>
-                  <select
-                    className="px-2 py-1 bg-[#3c6255] rounded-md text-[#eae7b1] cursor-pointer appearance-none pr-6 hover:bg-[#2c4f43] transition-colors text-base"
-                    value={newReviewRating}
-                    onChange={(e) => setNewReviewRating(e.target.value)}
-                  >
-                    <option value="5">5</option>
-                    <option value="4">4</option>
-                    <option value="3">3</option>
-                    <option value="2">2</option>
-                    <option value="1">1</option>
-                  </select>
-                </div>
-              </div>
-
-              <textarea
-                id="add-review-input"
-                value={newReviewText}
-                onChange={(e) => setNewReviewText(e.target.value)}
-                placeholder="Tambahkan review..."
-                className="w-full p-2 rounded-md bg-[#eae7b1] text-base text-[#3c6255] border border-[#3c6255] focus:outline-none focus:border-[#2c4f43] resize-y mb-4"
-                rows="3"
-              />
-
-              <button
-                onClick={handleSubmitReview}
-                className="self-end px-4 py-2 bg-[#3c6255] text-[#eae7b1] rounded-md shadow-md hover:opacity-90"
-              >
-                Kirim Review
-              </button>
-</div>
-
+        <section className="mb-12" id="review-section">
+          <div className="w-full p-6 bg-[#a6bb8d]/50 rounded-md mb-6 flex items-center">
+            <div className="w-[70px] h-[70px] rounded-full overflow-hidden mr-4">
+              <img src={`/storage/profile/${user?.img_url}`} alt="User Avatar" className="w-full h-full object-cover"/>
+            </div>
+            <input
+              id="add-review-input"
+              className="flex-grow text-base p-2 bg-transparent border-b-2 border-[#3c6255] focus:outline-none"
+              placeholder="Tambahkan review..."
+              disabled
+            />
+          </div>
 
           <div className="flex flex-col">
             {selectedPodcast.reviews?.length > 0 ? (
-              [...selectedPodcast.reviews]
-                .sort((a, b) => {
-                  const isAUser = a.user?.id === user?.id;
-                  const isBUser = b.user?.id === user?.id;
-                  return isBUser - isAUser; // true = 1, false = 0 → sort true (user review) to top
-                })
-                .map((rev, i) => (
-                  <ReviewCard
-                    key={rev.id}
-                    id={rev.id}
-                    avatarSrc={`/storage/profile/${rev.user?.img_url}`}
-                    name={rev.user?.name}
-                    email={rev.user?.email}
-                    reviewText={rev.comment}
-                    rating={rev.rating}
-                    reviewUserId={rev.user?.id}
-                    currentUserId={user?.id}
-                    isEditing={editingReviewId === rev.id}
-                    onEdit={handleEditReview}
-                    onCancelEdit={handleCancelEdit}
-                    onSaveEdit={handleSaveEditReview}
-                    onDelete={handleDeleteReview}
-                    isDeleting={isDeleting}
-                  />
-                ))
+              selectedPodcast.reviews.map((rev, i) => (
+                <ReviewCard
+                  key={i}
+                  avatarSrc={`/storage/profile/${rev.user?.img_url}`}
+                  name={rev.user?.name}
+                  email={rev.user?.email}
+                  reviewText={rev.comment}
+                />
+              ))
             ) : (
               <p className="text-base text-[#3c6255]">Belum ada review untuk podcast ini.</p>
             )}
@@ -342,7 +212,7 @@ export const Detail = () => {
               <p className="text-xs mb-1">Channel</p>
               <p className="text-base font-semibold mb-4">{selectedPodcast.channel?.name}</p>
               <p className="text-xs mb-1">Creator</p>
-              <p className="text-base font-semibold mb-4">{selectedPodcast.creator}</p>
+              <p className="text-base font-semibold mb-4">{selectedPodcast.creator_name}</p>
               <p className="text-xs mb-1">Show-Web</p>
               <p className="text-base font-semibold">{selectedPodcast.show_web}</p>
             </div>
@@ -373,10 +243,9 @@ export const Detail = () => {
       <AddPlaylist
         isOpen={isAddPlaylistPopupOpen}
         onClose={handleCloseAddPlaylistPopup}
-        playlists={playlists}
+        playlists={playlistsData}
         onAddToPlaylist={handleAddToPlaylist}
       />
-
     </div>
   );
 };

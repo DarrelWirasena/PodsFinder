@@ -23,10 +23,8 @@ use App\Http\Controllers\Api\ReviewedPodcastController;
 
 Route::post('/signup', [AuthController::class, 'signup']);
 Route::post('/login', [AuthController::class, 'login']);
-
-Route::get('/podcasts', [PodcastController::class, 'index']); // 🔓 Public
-Route::get('/podcasts/{podcast}', [PodcastController::class, 'show']); // 🔓 Public
-Route::get('/podcasts/{id}/related', [PodcastController::class, 'related']); // 🔓 Public
+Route::get('/public-podcasts', [PodcastController::class, 'index']);
+Route::get('/podcasts/{id}/related', [PodcastController::class, 'related']);
 
 // ===================
 // Authenticated Routes
@@ -38,16 +36,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::put('/user/profile-image', [UserController::class, 'updateProfileImage']);
 
-    // CRUD for main entities (protected)
+    // CRUD for main entities
     Route::apiResource('/users', UserController::class);
     Route::apiResource('/channels', ChannelController::class);
+    Route::apiResource('/podcasts', PodcastController::class);
     Route::apiResource('/reviews', ReviewController::class);
     Route::apiResource('/playlists', PlaylistController::class);
-
-    // Hanya method selain GET untuk podcast (POST, PUT, DELETE)
-    Route::post('/podcasts', [PodcastController::class, 'store']);
-    Route::put('/podcasts/{podcast}', [PodcastController::class, 'update']);
-    Route::delete('/podcasts/{podcast}', [PodcastController::class, 'destroy']);
 
     // Reviewed Podcasts for a User
     Route::get('/users/{user}/reviewed-podcasts', [ReviewedPodcastController::class, 'index']);
@@ -63,6 +57,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/episodes/{id}', [EpisodeController::class, 'update']);
     Route::delete('/episodes/{id}', [EpisodeController::class, 'destroy']);
 
-    // Add review to podcast
+    // Add review to podcast (custom endpoint if different from /reviews)
     Route::post('/podcasts/{podcast}/reviews', [ReviewController::class, 'store']);
 });

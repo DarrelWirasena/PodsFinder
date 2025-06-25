@@ -3,37 +3,38 @@ import axiosClient from '../axios-client';
 import { Link } from 'react-router-dom';
 import PodsLogo from '../assets/images/PodsFinderHook.png';
 
-import { allPodcastsData, BerizikCover, Bapak2BangetCover, NightRide, PlaceholderImage } from '../data/podcastsData';
+// import { allPodcastsData, BerizikCover, Bapak2BangetCover, NightRide, PlaceholderImage } from '../data/podcastsData';
+import { PlaceholderImage } from '../data/podcastsData';
 import { useStateContext } from '../contexts/ContextsPorvider';
 
-const PodcastCard = ({ podcast }) => (
-  <Link to={`/detail/${podcast.id}`} className="block p-4 bg-[#eae7b1] rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+const PodcastCard = ({ podcasts }) => (
+  <Link to={`/detail/${podcasts.id}`} className="block p-4 bg-[#eae7b1] rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
     <div className="flex items-start gap-4">
       <img
-        src={podcast.coverImage || PlaceholderImage} 
-        alt={podcast.title}
-        className="w-24 h-24 rounded-lg object-cover flex-shrink-0"
-      />
+      src={podcasts.image_url ? `${import.meta.env.VITE_API_BASE_URL}/storage/podcast/${podcasts.image_url}` : PlaceholderImage}
+      alt={podcasts.title}
+      className="w-24 h-24 rounded-lg object-cover flex-shrink-0"
+    />
       <div className="flex-grow">
-        <h3 className="text-lg font-semibold text-[#3c6255] mb-1 leading-tight">{podcast.title}</h3>
+        <h3 className="text-lg font-semibold text-[#3c6255] mb-1 leading-tight">{podcasts.title}</h3>
         <p className="text-sm text-[#3c6255] mb-1 leading-snug">
-            {podcast.episodes && podcast.episodes.length > 0 ? podcast.episodes[0].title : 'No Episode Info'}
+            {podcasts.latest_episode ? podcasts.latest_episode.title : 'No Episode Info'}
         </p>
         <div className="flex items-center text-[#3c6255] text-sm">
           <i className="ri-star-s-fill mr-1"></i>
-          <p>{podcast.rating}</p>
+          <p>{podcasts.average_rating !== null ? podcasts.average_rating : 'Belum ada rating'}</p>
         </div>
       </div>
     </div>
     <div className="gap-3 mt-4 grid grid-cols-2"> 
       <button
-        onClick={(e) => { e.preventDefault(); console.log(`Review button clicked for ID: ${podcast.id}`); }}
+        onClick={(e) => { e.preventDefault(); console.log(`Review button clicked for ID: ${podcasts.id}`); }}
         className="flex-1 bg-[#3c6255] rounded-md h-8 text-[#EAE7B1] flex justify-center items-center hover:bg-[#2c4f43] transition-colors duration-300 text-sm px-2"
       >
         <i className="ri-edit-2-line mr-1"></i> Review
       </button>
       <button
-        onClick={(e) => { e.preventDefault(); console.log(`Playlist button clicked for ID: ${podcast.id}`); }}
+        onClick={(e) => { e.preventDefault(); console.log(`Playlist button clicked for ID: ${podcasts.id}`); }}
         className="flex-1 bg-[#3c6255] rounded-md h-8 text-[#EAE7B1] flex justify-center items-center hover:bg-[#2c4f43] transition-colors duration-300 text-sm px-2"
       >
         <i className="ri-heart-3-fill mr-1"></i> Playlist
@@ -45,24 +46,50 @@ const PodcastCard = ({ podcast }) => (
 export const HomePage = () => {
     const {user,token,setUser,setToken}=useStateContext()
     const homepageGenreNames = ['Komedi', 'Horor']; 
+    
+    const [podcasts, setPodcasts] = useState([]);
+    const [loading, setLoading] = useState(true);
+
     useEffect(() => {
-      axiosClient.get('/user')
+      axiosClient.get('/podcasts')
+        .then(response => {
+          setPodcasts(response.data.data); // asumsi API memakai Laravel resource pagination
+          setLoading(false);
+        })
+        .catch(error => {
+          console.error('Gagal mengambil data podcast:', error);
+          setLoading(false);
+        });
+        axiosClient.get('/user')
         .then(({data}) => {
           setUser(data)
         })
-  }, [])
+    }, []);
+
+  if (loading) return <p>Loading podcasts...</p>;
+    
+    // const featuredGenresData = homepageGenreNames.map(genreName => {
+    //     const podcasts = allPodcastsData.filter(podcast =>
+    //         podcast.info && podcast.info.genre && podcast.info.genre.toLowerCase() === genreName.toLowerCase()
+    //     );
+
+    //     const limitedPodcasts = podcasts.slice(0, 2);
+
+    //     return {
+    //         name: genreName,
+    //         podcasts: limitedPodcasts,
+    //     };
+    // }).filter(genre => genre.podcasts.length > 0); 
     const featuredGenresData = homepageGenreNames.map(genreName => {
-        const podcasts = allPodcastsData.filter(podcast =>
-            podcast.info && podcast.info.genre && podcast.info.genre.toLowerCase() === genreName.toLowerCase()
-        );
+    const matching = podcasts
+      .filter(p => p.genre && p.genre.toLowerCase() === genreName.toLowerCase())
+      .slice(0, 2); // hanya tampilkan 2 podcast per genre
 
-        const limitedPodcasts = podcasts.slice(0, 2);
-
-        return {
-            name: genreName,
-            podcasts: limitedPodcasts,
-        };
-    }).filter(genre => genre.podcasts.length > 0); 
+      return {
+        name: genreName,
+        podcasts: matching,
+      };
+    }); 
 
   return (
     <div className="homepage pb-4 bg-[#EAE7B1]">
@@ -99,10 +126,10 @@ export const HomePage = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6">
-              {genre.podcasts.map((podcast) => (
+              {genre.podcasts.map((podcasts) => (
                 <PodcastCard
-                  key={podcast.id}
-                  podcast={podcast} 
+                  key={podcasts.id}
+                  podcasts={podcasts} 
                 />
               ))}
             </div>

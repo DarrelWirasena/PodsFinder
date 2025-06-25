@@ -14,18 +14,22 @@ class PodcastResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
+       return [
             'id'            => $this->id,
             'title'         => $this->title,
             'description'   => $this->description,
             'image_url'     => $this->image_url,
-            'category'      => $this->category,
-            'genre'         => $this->genre,
-            'creator'       => $this->creator,
+            'creator'       => $this->creator_name,
             'start_year'    => $this->start_year,
             'end_year'      => $this->end_year,
-            'episodes_count' => $this->episodes()->count(),
+            'genre'         => $this->genre,
+            'episodes_count'=> $this->episodes()->count(),
             'channel'       => new ChannelResource($this->whenLoaded('channel')),
+            'episodes'      => EpisodeResource::collection($this->whenLoaded('episodes')),
+            'latest_episode' => new EpisodeResource($this->whenLoaded('latestEpisode')),
+            'average_rating' => round($this->reviews()->avg('rating'), 1),
+            'reviews' => ReviewResource::collection($this->whenLoaded('reviews')),
         ];
+
     }
 }
