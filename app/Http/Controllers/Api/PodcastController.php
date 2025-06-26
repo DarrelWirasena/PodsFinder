@@ -83,6 +83,30 @@ class PodcastController extends Controller
     return response()->json(['message' => 'Podcast deleted successfully']);
     }
 
+    public function search(Request $request)
+    {
+        $query = $request->query('query'); // ✅ sesuai dengan URL frontend
+
+        if (!$query) {
+            return response()->json([
+                'message' => 'Query kosong',
+                'data' => []
+            ]);
+        }
+
+        $results = Podcast::with('channel', 'latestEpisode', 'reviews')
+            ->where('title', 'like', "%$query%")
+            ->orWhere('genre', 'like', "%$query%")
+            ->orWhereHas('channel', function ($q) use ($query) {
+                $q->where('name', 'like', "%$query%");
+            })
+            ->get();
+
+        return PodcastResource::collection($results);
+    }
+
+
+
     public function related($id)
     {
         $podcast = Podcast::findOrFail($id);

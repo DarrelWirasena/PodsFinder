@@ -7,17 +7,26 @@ import axiosClient from '../axios-client';
 import { useStateContext } from '../contexts/ContextsPorvider';
 
 
-const UserProfile = ({ profileImage, username, onClick }) => (
-  <div
-    className="flex items-center cursor-pointer hover:opacity-80 transition-opacity duration-200"
-    onClick={onClick}
-  >
-    <img src={profileImage} alt="Profile" className="w-15 h-15 rounded-full mr-4 object-cover" />
-    <div>
-      <p className="text-xl font-semibold text-[#3c6255]">{username}</p>
+const UserProfile = ({ profileImage, username, onClick }) => {
+  const imageUrl = profileImage?.image_url ? `${import.meta.env.VITE_API_BASE_URL}/storage/profil/${profileImage.image_url}` : `${import.meta.env.VITE_API_BASE_URL}/storage/profile/defaultPP.webp`;
+
+
+  return (
+    <div
+      className="flex items-center cursor-pointer hover:opacity-80 transition-opacity duration-200"
+      onClick={onClick}
+    >
+      <img
+        src={imageUrl}
+        alt="Profile"
+        className="w-16 h-16 rounded-full mr-4 object-cover"
+      />
+      <div>
+        <p className="text-xl font-semibold text-[#3c6255]">{username}</p>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const PlaylistCard = ({ playlist }) => (
   <Link to={`/playlistviewall/${playlist.id}`} className="block bg-[#3c6255] p-2 w-auto h-auto rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
@@ -26,7 +35,7 @@ const PlaylistCard = ({ playlist }) => (
       {playlist.podcasts.slice(0, 4).map((podcast, index) => (
         <img
           key={index}
-          src={podcast.image_url ? `/storage/${podcast.image_url}` : PlaceholderImage}
+          src={podcast.image_url ? `${import.meta.env.VITE_API_BASE_URL}/storage/podcast/${podcast.image_url}` : PlaceholderImage}
           alt={`Podcast ${index + 1}`}
           className="w-20 h-20 rounded object-cover aspect-square"
         />
@@ -76,25 +85,6 @@ export const Profil = () => {
 
   const { user, token, setUser, setToken } = useStateContext()
 
-  // useEffect(() => {
-  //   if (!token) return;
-
-  //   axiosClient.get('/user').then(({ data }) => {
-  //     setUser(data);
-  //   });
-
-  //   axiosClient.get('/playlists').then(({ data }) => {
-  //     const userPlaylists = data.data.filter(p => p.user?.id === user?.id);
-  //     setPlaylists(userPlaylists);
-  //   });
-
-  //   if (user?.id) {
-  //     axiosClient.get(`/users/${user.id}/reviewed-podcasts`).then(({ data }) => {
-  //       setReviewedPodcasts(data.data);
-  //     });
-  //   }
-  // }, [token, user?.id]);
-
   useEffect(() => {
     if (!token) return;
 
@@ -134,7 +124,9 @@ export const Profil = () => {
       <div className="max-w-screen-xl mx-auto px-4">
         <div className="flex justify-between items-start mb-10">
           <UserProfile
-            profileImage={profileImage}
+            profileImage={{
+              image_url: user.img_url // ← Ambil dari backend
+            }}
             username={user.name}
             onClick={() => setIsEditOpen(true)}
           />
@@ -188,9 +180,30 @@ export const Profil = () => {
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
         currentUsername={user.name}
-        onSave={({ username, profileImage }) => {
+        currentProfileUrl={
+          user.img_url
+            ? `${import.meta.env.VITE_API_BASE_URL}/storage/profil/${user.img_url}`
+            : `${import.meta.env.VITE_API_BASE_URL}/storage/profil/defaultPP.webp`
+        }
+        onSave={({ username, profileFile }) => {
+          axiosClient.put('/user', { name: username });
           setUser((prev) => ({ ...prev, name: username }));
-          setProfileImage(profileImage);
+
+          if (profileFile) {
+            const formData = new FormData();
+            formData.append('image', profileFile);
+            axiosClient
+              .post('/user/profile-image', formData, {
+                headers: {
+                  'Content-Type': 'multipart/form-data',
+                },
+              })
+              .then(({ data }) => {
+                setUser((prev) => ({ ...prev, img_url: data.img_url }));
+              });
+          }
+          console.log("profileFile:", profileFile);
+
         }}
       />
     </div>

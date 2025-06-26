@@ -18,6 +18,8 @@ import { DetailChannel } from "./pages/DetailChannel";
 import { PlaylistViewAll } from "./pages/PlaylistViewAll";
 import { Profil } from "./pages/Profil";
 import { useStateContext } from "./contexts/ContextsPorvider";
+import SearchResult from './pages/SearchResult';
+
 
 
 function App() {
@@ -76,6 +78,7 @@ function App() {
           <Route path="/reviewed" element={<Reviewed />} />
           <Route path="/profil" element={<Profil/>}/>
           <Route path="/playlistviewall/:playlistId" element={<PlaylistViewAll onTriggerConfirm={triggerConfirm}/>} />
+          <Route path="/search-result" element={<SearchResult />} />
         </Routes>
       </main>
 

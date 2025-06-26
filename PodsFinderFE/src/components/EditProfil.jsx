@@ -1,17 +1,25 @@
-import React, { useState } from 'react';
-import { PlaceholderImage } from '../data/podcastsData'; 
+import React, { useEffect, useState } from 'react';
 
-const EditProfil = ({ isOpen, onClose, currentUsername, onSave }) => {
-  const [newUsername, setNewUsername] = useState(currentUsername);
-  const [newProfileImage, setNewProfileImage] = useState(PlaceholderImage); 
+const EditProfil = ({ isOpen, onClose, currentUsername, currentProfileUrl, onSave }) => {
+  const [newUsername, setNewUsername] = useState('');
+  const [previewImage, setPreviewImage] = useState('');
+  const [profileFile, setProfileFile] = useState(null);
 
-  if (!isOpen) return null; 
+  useEffect(() => {
+  if (isOpen) {
+    setNewUsername(currentUsername || '');
+    setProfileFile(null);
+    setPreviewImage(currentProfileUrl || `${import.meta.env.VITE_API_BASE_URL}/storage/profile/defaultPP.webp`);
+  }
+}, [isOpen, currentUsername, currentProfileUrl]);
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setProfileFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setNewProfileImage(reader.result);
+        setPreviewImage(reader.result);
       };
       reader.readAsDataURL(file);
     }
@@ -19,9 +27,14 @@ const EditProfil = ({ isOpen, onClose, currentUsername, onSave }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave({ username: newUsername, profileImage: newProfileImage });
+    onSave({
+      username: newUsername,
+      profileFile: profileFile,
+    });
     onClose();
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-[#a6bb8d]/40 bg-opacity-50 flex justify-center items-center z-50">
@@ -36,7 +49,7 @@ const EditProfil = ({ isOpen, onClose, currentUsername, onSave }) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex flex-col items-center mb-6">
             <img
-              src={newProfileImage}
+              src={previewImage || `${import.meta.env.VITE_API_BASE_URL}/storage/profile/defaultPP.webp`}
               alt="Preview Profil"
               className="w-24 h-24 rounded-full object-cover border-2 border-[#3c6255] mb-3"/>
             <label htmlFor="profile-image-upload" className="cursor-pointer bg-[#3c6255] text-[#eae7b1] px-4 py-2 rounded-md hover:bg-[#2c4f43] transition-colors">

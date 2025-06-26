@@ -2,35 +2,67 @@
 
 namespace App\Http\Controllers\Api;
 
+// use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+// use App\Http\Controllers\Api\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use Illuminate\Http\Request;
+
 
 class UserController extends Controller
 {
 
     public function updateProfileImage(Request $request)
     {
+        $user = auth()->user(); // Jangan lupa gunakan lowercase "auth()"
+
         $request->validate([
-            'img' => 'required|image|mimes:webp,jpg,jpeg,png|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp,gif|max:2048',
         ]);
 
-        $user = $request->user();
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = uniqid() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('public/profil', $filename);
 
-        $path = $request->file('img')->store('profile', 'public');
+            if ($user->img_url && Storage::exists('public/profil/' . $user->img_url)) {
+                Storage::delete('public/profil/' . $user->img_url);
+            }
 
-        // Optional: Hapus gambar lama jika bukan default
-        if ($user->img_url && $user->img_url !== 'storage/profile/defaultPP.webp') {
-            \Storage::disk('public')->delete(str_replace('storage/', '', $user->img_url));
+            $user->img_url = $filename;
+            $user->save();
+
+            return response()->json([
+                'message' => 'Profile image updated',
+                'img_url' => $filename,
+            ]);
         }
 
-        $user->img_url = 'storage/' . $path;
+        return response()->json(['message' => 'No image uploaded'], 400);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $user->name = $request->name;
         $user->save();
 
-        return new UserResource($user);
+        return response()->json([
+            'message' => 'Username updated successfully.',
+            'data' => $user
+        ]);
     }
+
+
 
     /**
      * Display a listing of the resource.

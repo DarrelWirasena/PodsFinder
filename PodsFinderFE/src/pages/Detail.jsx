@@ -358,7 +358,7 @@ export const Detail = () => {
                   <ReviewCard
                     key={rev.id}
                     id={rev.id}
-                    avatarSrc={`/storage/profile/${rev.user?.img_url}`}
+                    avatarSrc={rev.image_url ? `${import.meta.env.VITE_API_BASE_URL}/storage/podcast/${rev.image_url}` : `${import.meta.env.VITE_API_BASE_URL}/storage/profile/defaultPP.webp` }
                     name={rev.user?.name}
                     email={rev.user?.email}
                     reviewText={rev.comment}

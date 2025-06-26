@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from 'react-router-dom';
+import { Link ,useNavigate} from 'react-router-dom';
 import axiosClient from '../axios-client';
 import { useStateContext } from "../contexts/ContextsPorvider";
 
@@ -10,6 +10,23 @@ export const NavbarUser = ({ onSearchClick }) => {
     const [loading, setLoading] = useState(false);
     const [show, setShow] = useState(false);
     const [scroll, setScroll] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (searchTerm.trim() === '') return;
+
+        const delayDebounce = setTimeout(() => {
+            axiosClient.get(`/search?query=${searchTerm}`)
+            .then(({ data }) => {
+                console.log("Hasil pencarian:", data);
+                // Mungkin arahkan ke halaman hasil, atau tampilkan hasil dropdown.
+            });
+        }, 500); // debounce 500ms
+
+        return () => clearTimeout(delayDebounce);
+    }, [searchTerm]);
+
 
     useEffect(() => {
         getUsers();
@@ -51,6 +68,24 @@ export const NavbarUser = ({ onSearchClick }) => {
 
     let scrollActive = scroll ? "py-5 bg-[#3c6255] shadow" : "py-4";
 
+    const handleSearch = () => {
+        const query = searchTerm.trim();
+        if (!query) {
+            console.warn("Search term kosong, tidak mengirim permintaan.");
+            return; // Hentikan eksekusi kalau kosong
+        }
+
+        // Navigasi ke halaman hasil pencarian
+        // window.location.href = `/search?query=${encodeURIComponent(query)}`;
+        axiosClient.get(`/search?query=${searchTerm}`)
+        .then(({ data }) => {
+            console.log("Hasil pencarian:", data);
+            navigate('/search-result', { state: { results: data.data } }); // ← kirim hasil pencarian
+        });
+    };
+
+
+
     
   return (
     <div className="box h-15  bg-[#3c6255]">
@@ -62,15 +97,28 @@ export const NavbarUser = ({ onSearchClick }) => {
                         <img src="podsFinderLogoSaja.png" alt="PodsFinder Logo" className="h-8 w-auto block md:hidden"/>
                     </div>
                     <div>
-                        <div
-                            className="box border-2 border-[#EAE7B1] p-0.5 sm:p-1 md:p-1.5 w-full sm:w-28 md:w-32 lg:w-56 xl:w-60 rounded opacity-60 cursor-pointer"
-                            onClick={onSearchClick}>
+                        <div className="flex border-2 border-[#EAE7B1] rounded opacity-60 overflow-hidden">
                             <input
-                                placeholder="Search"
-                                className="button font-medium text-[#EAE7B1] w-full text-center bg-transparent focus:outline-none"
-                                readOnly 
+                                type="text"
+                                placeholder="Search podcasts..."
+                                className="button font-medium text-[#EAE7B1] w-full text-center bg-transparent focus:outline-none px-2"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleSearch();
+                                }
+                                }}
                             />
+                            <button
+                                onClick={handleSearch}
+                                className="px-2 text-[#EAE7B1] bg-transparent hover:text-white"
+                                title="Search"
+                            >
+                                <i className="ri-search-line text-xl"></i>
+                            </button>
                         </div>
+
                     </div>
                     <ul className={`flex lg:gap-12 md:static md:flex-row md:shadow-none md:bg-transparent md:w-auto md:h-full md:translate-y-0 md:p-0 md:m-0 md:transition-none gap-6 fixed ${menuActive} top-1/2 -translate-y-1/2 flex-col px-8 py-6 rounded
                     shadow-lg shadow-slate-300 bg-[#3c6255] font-bold transition-all`}>

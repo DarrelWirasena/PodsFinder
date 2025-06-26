@@ -27,6 +27,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/podcasts', [PodcastController::class, 'index']); // 🔓 Public
 Route::get('/podcasts/{podcast}', [PodcastController::class, 'show']); // 🔓 Public
 Route::get('/podcasts/{id}/related', [PodcastController::class, 'related']); // 🔓 Public
+Route::get('/search', [PodcastController::class, 'search']); // 🔍 Search
+
 
 // ===================
 // Authenticated Routes
@@ -43,6 +45,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/channels', ChannelController::class);
     Route::apiResource('/reviews', ReviewController::class);
     Route::apiResource('/playlists', PlaylistController::class);
+    Route::put('/user', [UserController::class, 'updateProfile']); 
+    // Route
+    Route::post('/user/profile-image', [UserController::class, 'updateProfileImage']);
+
 
     // Hanya method selain GET untuk podcast (POST, PUT, DELETE)
     Route::post('/podcasts', [PodcastController::class, 'store']);
